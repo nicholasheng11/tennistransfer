@@ -5,116 +5,360 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#11203a" />
   <title>Add Player — Tennis Transfer Tracker</title>
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
   <style>
-    :root { --navy:#11203a; --bg:#f4f5f7; --border:#d0d5dd; --accent:#16a34a; }
+    :root { --navy:#11203a; --bg:#f4f5f7; --border:#d0d5dd; --accent:#16a34a; --muted:#6b7280; }
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:#1a1d23; line-height:1.45; }
     header { background:var(--navy); color:#fff; padding:18px 16px; }
     header h1 { font-size:19px; }
     header p { font-size:13px; opacity:.8; margin-top:2px; }
-    .wrap { max-width:560px; margin:0 auto; padding:18px 16px 60px; }
+    .wrap { max-width:620px; margin:0 auto; padding:16px 16px 64px; }
+
+    /* Tabs */
+    .tabs { display:flex; gap:8px; margin-bottom:18px; }
+    .tab {
+      flex:1; padding:12px 10px; min-height:46px; border:1px solid var(--border);
+      background:#fff; border-radius:10px; font-size:15px; font-weight:600;
+      color:#374151; cursor:pointer;
+    }
+    .tab.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+
+    .panel { display:none; }
+    .panel.active { display:block; }
+
     label { display:block; font-size:13px; font-weight:600; margin:14px 0 5px; }
-    input, select { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:9px; font-size:15px; background:#fff; }
-    button { margin-top:20px; width:100%; background:var(--accent); color:#fff; border:none; padding:13px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; }
-    .out { margin-top:20px; display:none; }
-    textarea { width:100%; height:90px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; padding:10px; border:1px solid var(--border); border-radius:9px; background:#fff; }
-    .copy { background:var(--navy); margin-top:10px; }
+    input, select, textarea {
+      width:100%; padding:12px; min-height:46px; border:1px solid var(--border);
+      border-radius:9px; font-size:16px; background:#fff; font-family:inherit;
+    }
+    textarea { min-height:120px; resize:vertical; line-height:1.4; }
+    .hint { font-size:12px; color:var(--muted); margin-top:6px; }
+
+    button.action {
+      margin-top:18px; width:100%; min-height:50px; background:var(--accent); color:#fff;
+      border:none; padding:14px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer;
+    }
+    button.secondary { background:var(--navy); }
+
+    /* Smart-paste parsed fields + mode note */
+    #p-fields { display:none; margin-top:8px; padding-top:8px; border-top:1px solid var(--border); }
+    .mode-note { margin-top:14px; padding:10px 12px; border-radius:9px; font-size:13px; line-height:1.4; }
+    .mode-note.new    { background:#ecfdf5; color:#065f46; }
+    .mode-note.update { background:#eff6ff; color:#1e40af; }
+    .mode-note.warn   { background:#fef3c7; color:#92400e; }
+
+    /* Shared output */
+    #output { display:none; margin-top:24px; padding-top:18px; border-top:2px solid var(--border); }
+    #out-text { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; min-height:120px; }
+    #out-note { display:none; margin-top:10px; font-size:13px; color:var(--muted); white-space:pre-wrap; }
+
     .steps { background:#fff; border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-top:24px; font-size:14px; }
     .steps h2 { font-size:14px; margin-bottom:8px; }
-    .steps ol { margin-left:18px; }
-    .steps li { margin:5px 0; }
+    .steps li { margin:5px 0 5px 18px; }
     code { background:#eef0f3; padding:1px 5px; border-radius:5px; font-size:13px; }
+
+    /* Mobile: stack tabs vertically, keep big touch targets */
+    @media (max-width: 640px) {
+      .tabs { flex-direction:column; }
+      .tab { min-height:50px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Add a Player</h1>
-    <p>Private tool &middot; fill this in, copy the line, paste it into transfers.js</p>
+    <p>Private tool &middot; Single, Smart Paste, or Bulk &middot; copy the output into transfers.js</p>
   </header>
 
   <div class="wrap">
-    <label>Player name</label>
-    <input id="name" placeholder="e.g. Carlos Méndez" />
+    <div class="tabs">
+      <button class="tab active" data-tab="single">Single</button>
+      <button class="tab" data-tab="paste">Smart Paste</button>
+      <button class="tab" data-tab="bulk">Bulk</button>
+    </div>
 
-    <label>Status</label>
-    <select id="status">
-      <option>In Portal</option>
-      <option>Committed</option>
-      <option>Signed</option>
-      <option>Withdrawn</option>
-    </select>
+    <!-- SINGLE -->
+    <div class="panel active" id="panel-single">
+      <label>Player name</label>
+      <input id="s-name" placeholder="e.g. Carlos Méndez" />
+      <label>Status</label>
+      <select id="s-status">
+        <option>In Portal</option><option>Committed</option><option>Signed</option><option>Withdrawn</option>
+      </select>
+      <label>Previous school</label>
+      <input id="s-prev" placeholder="e.g. Florida" />
+      <label>New school</label>
+      <input id="s-new" placeholder="Leave blank if still In Portal" />
+      <label>Class year</label>
+      <input id="s-year" placeholder="e.g. Jr." />
+      <label>Hometown (optional)</label>
+      <input id="s-home" placeholder="e.g. Madrid, Spain" />
+      <button class="action" id="s-gen">Generate entry</button>
+    </div>
 
-    <label>Previous school</label>
-    <input id="previousSchool" placeholder="e.g. Florida" />
+    <!-- SMART PASTE -->
+    <div class="panel" id="panel-paste">
+      <label>Paste one X / Twitter post</label>
+      <textarea id="p-input" placeholder="e.g. BREAKING: Carlos Méndez has entered the transfer portal from Florida. The Jr. ..."></textarea>
+      <button class="action secondary" id="p-parse">Parse</button>
 
-    <label>New school</label>
-    <input id="newSchool" placeholder="Leave blank if still In Portal" />
+      <div id="p-fields">
+        <div id="p-mode" class="mode-note new">+ New entry.</div>
+        <label>Player name</label>
+        <input id="p-name" />
+        <label>Status</label>
+        <select id="p-status">
+          <option>In Portal</option><option>Committed</option><option>Signed</option><option>Withdrawn</option>
+        </select>
+        <label>Previous school</label>
+        <input id="p-prev" />
+        <label>New school</label>
+        <input id="p-new" />
+        <label>Class year</label>
+        <input id="p-year" />
+        <label>Hometown (optional)</label>
+        <input id="p-home" />
+        <button class="action" id="p-gen">Generate entry</button>
+      </div>
+    </div>
 
-    <label>Class year</label>
-    <input id="classYear" placeholder="e.g. Jr." />
+    <!-- BULK -->
+    <div class="panel" id="panel-bulk">
+      <label>One player per line — <code>Name, previousSchool, newSchool, status, classYear</code></label>
+      <textarea id="b-input" placeholder="Carlos Méndez, Florida, Auburn, C, Jr.
+Jonas Weber, Ohio State, , P, So.
+Diego Costa, Texas, TCU, S, Gr."></textarea>
+      <div class="hint">Status shortcuts: P/portal, C/committed, S/signed, W/withdrawn. New school may be blank. IDs auto-number from your highest existing ID.</div>
+      <button class="action" id="b-gen">Generate entries</button>
+    </div>
 
-    <label>Hometown (optional)</label>
-    <input id="hometown" placeholder="e.g. Madrid, Spain" />
-
-    <button id="gen">Generate entry</button>
-
-    <div class="out" id="out">
-      <label>Your entry (already formatted — safe to paste):</label>
-      <textarea id="result" readonly></textarea>
-      <button class="copy" id="copy">Copy to clipboard</button>
+    <!-- SHARED OUTPUT -->
+    <div id="output">
+      <label>Output — paste into transfers.js:</label>
+      <textarea id="out-text" readonly></textarea>
+      <div id="out-note"></div>
+      <button class="action secondary" id="copy">Copy to clipboard</button>
     </div>
 
     <div class="steps">
-      <h2>What to do with it</h2>
-      <ol>
-        <li>Click <strong>Generate entry</strong>, then <strong>Copy</strong>.</li>
-        <li>Open <code>transfers.js</code> in Notepad.</li>
-        <li>Paste it on its own line right under <code>const TRANSFERS = [</code>.</li>
-        <li>Save the file.</li>
-        <li>Drag the folder onto Netlify's <strong>Deploys</strong> tab to publish.</li>
-      </ol>
+      <h2>What to do with the output</h2>
+      <ul>
+        <li><strong>New entry / entries:</strong> paste under <code>const TRANSFERS = [</code> in transfers.js.</li>
+        <li><strong>Update line</strong> (Smart Paste, when a player already exists): find that player's line and <em>replace</em> it with the output.</li>
+        <li>Then commit transfers.js on GitHub — live in ~1 minute.</li>
+      </ul>
     </div>
   </div>
 
+  <!-- Read current data so we can detect existing players + auto-number IDs -->
+  <script src="transfers.js"></script>
   <script>
     const $ = id => document.getElementById(id);
+    const DATA = (typeof TRANSFERS !== "undefined" && Array.isArray(TRANSFERS)) ? TRANSFERS : [];
 
-    // Today's date as YYYY-MM-DD (controls newest-first ordering on the site).
     function todayISO() {
       const d = new Date();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return d.getFullYear() + "-" + m + "-" + day;
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
     }
 
-    // Build the entry. JSON.stringify on each value guarantees valid, safely-escaped
-    // text — this is what removes the quote/comma mistakes that blank the page.
-    $("gen").onclick = () => {
-      const name = $("name").value.trim();
-      if (!name) { alert("Please enter a player name."); return; }
-      const entry =
-        "  { id: " + JSON.stringify(String(Date.now())) +
-        ", name: " + JSON.stringify(name) +
-        ", status: " + JSON.stringify($("status").value) +
-        ", previousSchool: " + JSON.stringify($("previousSchool").value.trim()) +
-        ", newSchool: " + JSON.stringify($("newSchool").value.trim()) +
-        ", hometown: " + JSON.stringify($("hometown").value.trim()) +
-        ", classYear: " + JSON.stringify($("classYear").value.trim()) +
-        ", dateUpdated: " + JSON.stringify(todayISO()) + " },";
-      $("result").value = entry;
-      $("out").style.display = "block";
-    };
+    // Build one transfers.js line. JSON.stringify on each value = safe, valid, escaped.
+    function buildEntry(o) {
+      return "  { id: " + JSON.stringify(String(o.id)) +
+        ", name: " + JSON.stringify(o.name || "") +
+        ", status: " + JSON.stringify(o.status || "") +
+        ", previousSchool: " + JSON.stringify(o.previousSchool || "") +
+        ", newSchool: " + JSON.stringify(o.newSchool || "") +
+        ", hometown: " + JSON.stringify(o.hometown || "") +
+        ", classYear: " + JSON.stringify(o.classYear || "") +
+        ", dateUpdated: " + JSON.stringify(o.dateUpdated || todayISO()) + " },";
+    }
 
+    function maxId() {
+      return DATA.reduce((mx, p) => { const n = parseInt(p.id, 10); return (!isNaN(n) && n > mx) ? n : mx; }, 0);
+    }
+
+    function findExisting(name) {
+      const n = (name || "").trim().toLowerCase();
+      if (!n) return null;
+      return DATA.find(p => String(p.name).trim().toLowerCase() === n) || null;
+    }
+
+    // ---- Shared output ------------------------------------------------
+    function setOutput(text, note) {
+      $("out-text").value = text;
+      $("out-note").textContent = note || "";
+      $("out-note").style.display = note ? "block" : "none";
+      $("output").style.display = "block";
+      $("output").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
     $("copy").onclick = async () => {
-      const ta = $("result");
-      try {
-        await navigator.clipboard.writeText(ta.value);
-      } catch (e) {
-        ta.focus(); ta.select();
-        try { document.execCommand("copy"); } catch (_) {}
-      }
+      const ta = $("out-text");
+      try { await navigator.clipboard.writeText(ta.value); }
+      catch (e) { ta.focus(); ta.select(); try { document.execCommand("copy"); } catch (_) {} }
       $("copy").textContent = "Copied!";
       setTimeout(() => $("copy").textContent = "Copy to clipboard", 1500);
+    };
+
+    // ---- Tabs (autofocus main input on switch) ------------------------
+    const FOCUS = { single: "s-name", paste: "p-input", bulk: "b-input" };
+    function showTab(name) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+      document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
+      const f = $(FOCUS[name]);
+      if (f) f.focus();
+    }
+    document.querySelectorAll(".tab").forEach(t => t.onclick = () => showTab(t.dataset.tab));
+
+    // ---- SINGLE -------------------------------------------------------
+    $("s-gen").onclick = () => {
+      const name = $("s-name").value.trim();
+      if (!name) { alert("Please enter a player name."); return; }
+      setOutput(buildEntry({
+        id: Date.now(), name: name, status: $("s-status").value,
+        previousSchool: $("s-prev").value.trim(), newSchool: $("s-new").value.trim(),
+        hometown: $("s-home").value.trim(), classYear: $("s-year").value.trim(),
+        dateUpdated: todayISO()
+      }), "+ New entry — add this line to transfers.js.");
+    };
+
+    // ---- SMART PASTE --------------------------------------------------
+    function clean(s) { return (s || "").replace(/^["'\s]+/, "").replace(/["'\s.,!]+$/, "").trim(); }
+    // Trim trailing qualifiers off a captured school ("Texas A&M as a graduate transfer" -> "Texas A&M").
+    function stripQualifier(s) { return (s || "").replace(/\s+(as an?|ahead of|for the|over|after|to play|to join)\b.*$/i, "").trim(); }
+
+    function detectClassYear(text) {
+      if (/\bgraduate\b/i.test(text)) return "Gr.";
+      const m = text.match(/\b(R-?Sr|R-?Jr|Sr|Jr|So|Fr)\b\.?/i);
+      if (!m) return "";
+      const key = m[1].toUpperCase().replace(/-/g, "");
+      return ({ RSR: "R-Sr.", RJR: "R-Jr.", SR: "Sr.", JR: "Jr.", SO: "So.", FR: "Fr." })[key] || (m[1] + ".");
+    }
+
+    function parseTweet(raw) {
+      const res = { name: "", previousSchool: "", newSchool: "", status: "", classYear: "" };
+      if (!raw) return res;
+      // normalize curly quotes + whitespace, strip leading emojis and "BREAKING:" style labels
+      let t = raw.replace(/[‘’‛′]/g, "'").replace(/[“”″]/g, '"').replace(/\s+/g, " ").trim();
+      t = t.replace(/^[^A-Za-z"']+/, "");
+      t = t.replace(/^(BREAKING|NEWS|PORTAL ALERT|TRANSFER PORTAL NEWS|TRANSFER NEWS)\s*[:\-]?\s*/i, "");
+
+      res.classYear = detectClassYear(t);
+
+      let m;
+      // Name (School) has entered the [transfer] portal
+      if ((m = t.match(/^(.+?)\s*\(([^)]+)\)\s+has entered the (?:transfer )?portal/i))) {
+        res.name = clean(m[1]); res.previousSchool = clean(stripQualifier(m[2])); res.status = "In Portal"; return res;
+      }
+      // Name has entered the [transfer] portal from School
+      if ((m = t.match(/^(.+?)\s+has entered the (?:transfer )?portal from\s+(.+?)[.!]?$/i))) {
+        res.name = clean(m[1]); res.previousSchool = clean(stripQualifier(m[2])); res.status = "In Portal"; return res;
+      }
+      // Name has entered the [transfer] portal (no school)
+      if ((m = t.match(/^(.+?)\s+has entered the (?:transfer )?portal\b/i))) {
+        res.name = clean(m[1]); res.status = "In Portal"; return res;
+      }
+      // Name has committed to School
+      if ((m = t.match(/^(.+?)\s+has committed to\s+(.+?)[.!]?$/i))) {
+        res.name = clean(m[1]); res.newSchool = clean(stripQualifier(m[2])); res.status = "Committed"; return res;
+      }
+      // Name has signed with School
+      if ((m = t.match(/^(.+?)\s+has signed with\s+(.+?)[.!]?$/i))) {
+        res.name = clean(m[1]); res.newSchool = clean(stripQualifier(m[2])); res.status = "Signed"; return res;
+      }
+      // Fallback: take a leading capitalized run as the name
+      if ((m = t.match(/^([A-Z][\w'.-]+(?:\s+[A-Z][\w'.-]+){0,2})/))) { res.name = clean(m[1]); }
+      return res;
+    }
+
+    function refreshPasteMode() {
+      const existing = findExisting($("p-name").value);
+      const status = $("p-status").value;
+      const note = $("p-mode");
+      if (existing && (status === "Committed" || status === "Signed")) {
+        note.className = "mode-note update";
+        note.textContent = '↻ Update mode: matches "' + existing.name + '" already in the tracker (id ' +
+          JSON.stringify(String(existing.id)) + '). Generating a REPLACEMENT line — swap it for that player\'s existing line, don\'t add a new one.';
+      } else if (existing) {
+        note.className = "mode-note warn";
+        note.textContent = '⚠ A player named "' + existing.name + '" already exists. This makes a NEW entry (status isn\'t Committed/Signed) — check for duplicates.';
+      } else {
+        note.className = "mode-note new";
+        note.textContent = "+ New entry.";
+      }
+    }
+
+    $("p-parse").onclick = () => {
+      const p = parseTweet($("p-input").value);
+      $("p-name").value = p.name; $("p-prev").value = p.previousSchool;
+      $("p-new").value = p.newSchool; $("p-year").value = p.classYear;
+      $("p-status").value = p.status || "In Portal"; $("p-home").value = "";
+      $("p-fields").style.display = "block";
+      refreshPasteMode();
+      $("p-name").focus();
+    };
+    $("p-name").oninput = refreshPasteMode;
+    $("p-status").onchange = refreshPasteMode;
+
+    $("p-gen").onclick = () => {
+      const name = $("p-name").value.trim();
+      if (!name) { alert("Name is required."); return; }
+      const status = $("p-status").value;
+      const existing = findExisting(name);
+      if (existing && (status === "Committed" || status === "Signed")) {
+        // UPDATE: keep existing id/previousSchool/classYear/hometown; apply new status + newSchool; today's date
+        setOutput(buildEntry({
+          id: existing.id, name: existing.name, status: status,
+          previousSchool: existing.previousSchool,
+          newSchool: $("p-new").value.trim() || existing.newSchool,
+          hometown: existing.hometown || $("p-home").value.trim(),
+          classYear: existing.classYear || $("p-year").value.trim(),
+          dateUpdated: todayISO()
+        }), '↻ UPDATE — replace ' + existing.name + "'s existing line in transfers.js with this (same id " +
+          JSON.stringify(String(existing.id)) + ").");
+      } else {
+        setOutput(buildEntry({
+          id: Date.now(), name: name, status: status,
+          previousSchool: $("p-prev").value.trim(), newSchool: $("p-new").value.trim(),
+          hometown: $("p-home").value.trim(), classYear: $("p-year").value.trim(),
+          dateUpdated: todayISO()
+        }), "+ New entry — add this line to transfers.js.");
+      }
+    };
+
+    // ---- BULK ---------------------------------------------------------
+    function normStatus(s) {
+      const x = (s || "").trim().toLowerCase();
+      if (x === "p" || x === "portal" || x === "in portal") return "In Portal";
+      if (x === "c" || x === "committed") return "Committed";
+      if (x === "s" || x === "signed") return "Signed";
+      if (x === "w" || x === "withdrawn") return "Withdrawn";
+      return s ? s.trim() : "";
+    }
+
+    $("b-gen").onclick = () => {
+      const lines = $("b-input").value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (!lines.length) { alert("Paste at least one line."); return; }
+      const startId = maxId() + 1;
+      let nextId = startId;
+      const out = [];
+      const errs = [];
+      lines.forEach((line, i) => {
+        const parts = line.split(",").map(s => s.trim());
+        const name = parts[0] || "";
+        if (!name) { errs.push("line " + (i + 1) + " (no name)"); return; }
+        out.push(buildEntry({
+          id: nextId++, name: name,
+          previousSchool: parts[1] || "", newSchool: parts[2] || "",
+          status: normStatus(parts[3] || ""), classYear: parts[4] || "",
+          hometown: "", dateUpdated: todayISO()
+        }));
+      });
+      if (!out.length) { alert("No valid lines found."); return; }
+      let note = "Generated " + out.length + " entr" + (out.length === 1 ? "y" : "ies") +
+        " (ids " + startId + "–" + (nextId - 1) + "). Add these lines to transfers.js.";
+      if (errs.length) note += "\nSkipped: " + errs.join(", ");
+      setOutput(out.join("\n"), note);
     };
   </script>
 </body>
