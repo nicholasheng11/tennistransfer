@@ -17,7 +17,7 @@ const TRANSFERS = [
   { id: "23", name: "Nikola Puntarič", status: "Committed", previousSchool: "Northern Illinois", newSchool: "UIC", hometown: "Ljubljana, Slovenia", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "24", name: "Raffi Ymer", status: "Committed", previousSchool: "Elon", newSchool: "Kentucky", hometown: "Sweden", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "25", name: "Jakub Volesky", status: "Committed", previousSchool: "Northern Arizona", newSchool: "VCU", hometown: "Czech Republic", classYear: "", dateUpdated: "2026-05-27" },
-  { id: "26", name: "Andrew Delgado", status: "Committed", previousSchool: "Wake Forest", newSchool: "Georgia", hometown: "", classYear: "R-Fr.", dateUpdated: "2026-05-27" },
+  { id: "26", name: "Andrew Delgado", status: "Committed", previousSchool: "Wake Forest", newSchool: "Georgia", hometown: "Greensboro, North Carolina", classYear: "R-Fr.", dateUpdated: "2026-05-27" },
   { id: "27", name: "Oscar Baumgartner", status: "Committed", previousSchool: "UNCW", newSchool: "St. Joseph's", hometown: "Vevey, Switzerland", classYear: "", dateUpdated: "2026-05-27" },
   { id: "28", name: "Setti Germano", status: "Signed", previousSchool: "Midwestern State", newSchool: "DePaul", hometown: "Carazinho, Brazil", classYear: "", dateUpdated: "2026-05-27" },
   { id: "29", name: "Jewan Labuschagne", status: "In Portal", previousSchool: "Nicholls State", newSchool: "", hometown: "Pretoria, South Africa", classYear: "So.", dateUpdated: "2026-05-27" },
