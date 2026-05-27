@@ -171,8 +171,10 @@
         <label for="sort">Sort:</label>
         <select id="sort">
           <option value="newest">Newest</option>
-          <option value="newSchool">By new school</option>
-          <option value="prevSchool">By previous school</option>
+          <option value="rankHigh">Highest ranked destination</option>
+          <option value="rankLow">Lowest ranked destination</option>
+          <option value="newSchool">School A &rarr; Z</option>
+          <option value="prevSchool">Previous school A &rarr; Z</option>
         </select>
       </div>
       <div class="sortwrap">
@@ -328,8 +330,19 @@
         players = players.filter(p => isMidMajor(p.previousSchool));
       }
 
-      // 3. sort (empty new-school values sort to the end for "By new school")
-      if (sortBy === "newSchool") {
+      // 3. sort
+      if (sortBy === "rankHigh" || sortBy === "rankLow") {
+        // By destination ITA rank. Ranked schools first (asc for High, desc for Low);
+        // unranked / In Portal sort to the bottom, newest-first among themselves.
+        players.sort((a, b) => {
+          const ra = rankOf(a.newSchool), rb = rankOf(b.newSchool);
+          const aR = ra != null, bR = rb != null;
+          if (aR && bR) return sortBy === "rankHigh" ? ra - rb : rb - ra;
+          if (aR) return -1;
+          if (bR) return 1;
+          return b.dateUpdated.localeCompare(a.dateUpdated);
+        });
+      } else if (sortBy === "newSchool") {
         players.sort((a, b) => (a.newSchool || "￿").localeCompare(b.newSchool || "￿"));
       } else if (sortBy === "prevSchool") {
         players.sort((a, b) => a.previousSchool.localeCompare(b.previousSchool));
