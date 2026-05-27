@@ -130,6 +130,7 @@
     /* school transfer line is the visual focus: bold names, light arrow */
     .schools { margin-top: 8px; font-size: 15px; font-weight: 600; color: var(--text); }
     .arrow { color: #9ca3af; font-weight: 400; padding: 0 6px; }
+    .rank { font-size: 0.85em; color: #6b7280; font-weight: 500; margin-left: 4px; }
 
     .meta { margin-top: 8px; font-size: 12px; color: #6b7280; }
     .updated { cursor: help; }
@@ -230,6 +231,10 @@
     // (which means a Division I program that isn't Power 4). Add to this list if a non-D1 school shows up.
     const NON_D1 = new Set(["UIndy","Midwestern State","West Alabama","Saint Leo","Collin College","Middle Georgia State","Mississippi College"]);
     const isMidMajor = school => !!school && !isP4(school) && !NON_D1.has(school);
+
+    // ITA team rankings (rankings.js). Schools not listed are unranked.
+    const RANKINGS = (typeof ITA_RANKINGS_M !== "undefined" && ITA_RANKINGS_M) ? ITA_RANKINGS_M : {};
+    const rankOf = school => (school && RANKINGS[school] != null) ? RANKINGS[school] : null;
 
     // Turn a status like "In Portal" into a CSS class like "inportal".
     function badgeClass(status) {
@@ -342,8 +347,10 @@
       }
 
       grid.innerHTML = players.map(p => {
+        const rank = rankOf(p.newSchool);
+        const rankTag = (rank != null) ? '<span class="rank">#' + rank + '</span>' : '';
         const schools = p.newSchool
-          ? esc(p.previousSchool) + '<span class="arrow">&rarr;</span>' + esc(p.newSchool)
+          ? esc(p.previousSchool) + '<span class="arrow">&rarr;</span>' + esc(p.newSchool) + rankTag
           : esc(p.previousSchool);
         const year = p.classYear ? ' <span class="year">&middot; ' + esc(p.classYear) + '</span>' : "";
         // Bottom meta line: hometown (if present) + relative "Updated ..." with exact-date tooltip.
