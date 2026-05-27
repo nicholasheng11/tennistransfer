@@ -134,6 +134,7 @@
 
     .meta { margin-top: 8px; font-size: 12px; color: #6b7280; }
     .updated { cursor: help; }
+    .utr { font-weight: 600; }
 
     /* ---- Status badges (one color per status) ------------------------- */
     .badge {
@@ -173,6 +174,7 @@
           <option value="newest">Newest</option>
           <option value="rankHigh">Highest ranked destination</option>
           <option value="rankLow">Lowest ranked destination</option>
+          <option value="utr">Highest UTR</option>
           <option value="newSchool">School A &rarr; Z</option>
           <option value="prevSchool">Previous school A &rarr; Z</option>
         </select>
@@ -342,6 +344,16 @@
           if (bR) return 1;
           return b.dateUpdated.localeCompare(a.dateUpdated);
         });
+      } else if (sortBy === "utr") {
+        // Highest UTR first; players with no UTR sort to the bottom (newest-first tiebreak).
+        players.sort((a, b) => {
+          const ua = parseFloat(a.utr), ub = parseFloat(b.utr);
+          const aH = !isNaN(ua), bH = !isNaN(ub);
+          if (aH && bH) return ub - ua;
+          if (aH) return -1;
+          if (bH) return 1;
+          return b.dateUpdated.localeCompare(a.dateUpdated);
+        });
       } else if (sortBy === "newSchool") {
         players.sort((a, b) => (a.newSchool || "￿").localeCompare(b.newSchool || "￿"));
       } else if (sortBy === "prevSchool") {
@@ -372,7 +384,10 @@
         const year = p.classYear ? ' <span class="year">&middot; ' + esc(p.classYear) + '</span>' : "";
         // Bottom meta line: hometown (if present) + relative "Updated ..." with exact-date tooltip.
         const updated = '<span class="updated" title="' + esc(p.dateUpdated) + '">' + esc(relativeUpdated(p.dateUpdated)) + '</span>';
-        const metaParts = p.hometown ? [esc(p.hometown), updated] : [updated];
+        const metaParts = [];
+        if (p.hometown) metaParts.push(esc(p.hometown));
+        if (p.utr) metaParts.push('<span class="utr">UTR ' + esc(p.utr) + '</span>');
+        metaParts.push(updated);
         const meta = '<div class="meta">' + metaParts.join(' &middot; ') + '</div>';
         return `
           <div class="card">
