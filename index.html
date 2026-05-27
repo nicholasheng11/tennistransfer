@@ -178,8 +178,6 @@
           <option value="rankHigh">Highest ranked destination</option>
           <option value="rankLow">Lowest ranked destination</option>
           <option value="utr">Highest UTR</option>
-          <option value="newSchool">School A &rarr; Z</option>
-          <option value="prevSchool">Previous school A &rarr; Z</option>
         </select>
       </div>
       <div class="sortwrap">
@@ -385,13 +383,11 @@
           ? prev + '<span class="arrow">&rarr;</span>' + esc(p.newSchool) + newRankTag
           : prev;
         const year = p.classYear ? ' <span class="year">&middot; ' + esc(p.classYear) + '</span>' : "";
-        // Bottom meta line: hometown (if present) + relative "Updated ..." with exact-date tooltip.
-        const updated = '<span class="updated" title="' + esc(p.dateUpdated) + '">' + esc(relativeUpdated(p.dateUpdated)) + '</span>';
+        // Bottom meta line: hometown and/or UTR (whichever present). Hidden entirely if both empty.
         const metaParts = [];
         if (p.hometown) metaParts.push(esc(p.hometown));
         if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
-        metaParts.push(updated);
-        const meta = '<div class="meta">' + metaParts.join(' &middot; ') + '</div>';
+        const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
         return `
           <div class="card">
             <div class="card-top">
