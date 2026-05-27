@@ -131,7 +131,8 @@
     .schools { margin-top: 8px; font-size: 15px; font-weight: 600; color: var(--text); }
     .arrow { color: #9ca3af; font-weight: 400; padding: 0 6px; }
 
-    .meta { margin-top: 8px; font-size: 12px; color: var(--muted); }
+    .meta { margin-top: 8px; font-size: 12px; color: #6b7280; }
+    .updated { cursor: help; }
 
     /* ---- Status badges (one color per status) ------------------------- */
     .badge {
@@ -218,6 +219,21 @@
       return months[Number(p[1]) - 1] + " " + Number(p[2]) + ", " + p[0];
     }
 
+    // Relative "Updated ..." label from a YYYY-MM-DD date.
+    function relativeUpdated(iso) {
+      if (!iso) return "";
+      const p = iso.split("-");
+      const then = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const days = Math.round((today - then) / 86400000);
+      if (days <= 0) return "Updated today";
+      if (days === 1) return "Updated yesterday";
+      if (days <= 6) return "Updated " + days + " days ago";
+      const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      return "Updated " + mon[then.getMonth()] + " " + then.getDate();
+    }
+
     // How many players have a given status (drives the pill counts).
     function statusCount(status) {
       return status === "All"
@@ -286,7 +302,10 @@
           ? esc(p.previousSchool) + '<span class="arrow">&rarr;</span>' + esc(p.newSchool)
           : esc(p.previousSchool);
         const year = p.classYear ? ' <span class="year">&middot; ' + esc(p.classYear) + '</span>' : "";
-        const hometown = p.hometown ? '<div class="meta">' + esc(p.hometown) + '</div>' : "";
+        // Bottom meta line: hometown (if present) + relative "Updated ..." with exact-date tooltip.
+        const updated = '<span class="updated" title="' + esc(p.dateUpdated) + '">' + esc(relativeUpdated(p.dateUpdated)) + '</span>';
+        const metaParts = p.hometown ? [esc(p.hometown), updated] : [updated];
+        const meta = '<div class="meta">' + metaParts.join(' &middot; ') + '</div>';
         return `
           <div class="card">
             <div class="card-top">
@@ -294,7 +313,7 @@
               <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
             </div>
             <div class="schools">${schools}</div>
-            ${hometown}
+            ${meta}
           </div>`;
       }).join("");
     }
