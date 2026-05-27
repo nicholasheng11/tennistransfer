@@ -94,6 +94,8 @@
       <input id="s-year" placeholder="e.g. Jr." />
       <label>Hometown (optional)</label>
       <input id="s-home" placeholder="e.g. Madrid, Spain" />
+      <label>UTR (optional)</label>
+      <input id="s-utr" placeholder="e.g. 12.80" />
       <button class="action" id="s-gen">Generate entry</button>
     </div>
 
@@ -119,17 +121,19 @@
         <input id="p-year" />
         <label>Hometown (optional)</label>
         <input id="p-home" />
+        <label>UTR</label>
+        <input id="p-utr" />
         <button class="action" id="p-gen">Generate entry</button>
       </div>
     </div>
 
     <!-- BULK -->
     <div class="panel" id="panel-bulk">
-      <label>One player per line — <code>Name, previousSchool, newSchool, status, classYear</code></label>
+      <label>One player per line — <code>Name, previousSchool, newSchool, status, classYear, utr</code></label>
       <textarea id="b-input" placeholder="Carlos Méndez, Florida, Auburn, C, Jr.
 Jonas Weber, Ohio State, , P, So.
 Diego Costa, Texas, TCU, S, Gr."></textarea>
-      <div class="hint">Status shortcuts: P/portal, C/committed, S/signed, W/withdrawn. New school may be blank. IDs auto-number from your highest existing ID.</div>
+      <div class="hint">Status shortcuts: P/portal, C/committed, S/signed, W/withdrawn. New school and UTR may be blank. IDs auto-number from your highest existing ID.</div>
       <button class="action" id="b-gen">Generate entries</button>
     </div>
 
@@ -170,6 +174,7 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
         ", previousSchool: " + JSON.stringify(o.previousSchool || "") +
         ", newSchool: " + JSON.stringify(o.newSchool || "") +
         ", hometown: " + JSON.stringify(o.hometown || "") +
+        ", utr: " + JSON.stringify(o.utr || "") +
         ", classYear: " + JSON.stringify(o.classYear || "") +
         ", dateUpdated: " + JSON.stringify(o.dateUpdated || todayISO()) + " },";
     }
@@ -217,7 +222,7 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       setOutput(buildEntry({
         id: Date.now(), name: name, status: $("s-status").value,
         previousSchool: $("s-prev").value.trim(), newSchool: $("s-new").value.trim(),
-        hometown: $("s-home").value.trim(), classYear: $("s-year").value.trim(),
+        hometown: $("s-home").value.trim(), utr: $("s-utr").value.trim(), classYear: $("s-year").value.trim(),
         dateUpdated: todayISO()
       }), "+ New entry — add this line to transfers.js.");
     };
@@ -235,8 +240,14 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       return ({ RSR: "R-Sr.", RJR: "R-Jr.", SR: "Sr.", JR: "Jr.", SO: "So.", FR: "Fr." })[key] || (m[1] + ".");
     }
 
+    // Pull a UTR snapshot out of the post: "(12.80 UTR)" / "UTR 12.80" / "(UTR 13.17)"
+    function detectUTR(text) {
+      const m = text.match(/(\d{1,2}\.\d{1,2})\s*UTR/i) || text.match(/UTR\s*(\d{1,2}\.\d{1,2})/i);
+      return m ? m[1] : "";
+    }
+
     function parseTweet(raw) {
-      const res = { name: "", previousSchool: "", newSchool: "", status: "", classYear: "" };
+      const res = { name: "", previousSchool: "", newSchool: "", status: "", classYear: "", utr: "" };
       if (!raw) return res;
       // normalize curly quotes + whitespace, strip leading emojis and "BREAKING:" style labels
       let t = raw.replace(/[‘’‛′]/g, "'").replace(/[“”″]/g, '"').replace(/\s+/g, " ").trim();
@@ -244,6 +255,12 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       t = t.replace(/^(BREAKING|NEWS|PORTAL ALERT|TRANSFER PORTAL NEWS|TRANSFER NEWS)\s*[:\-]?\s*/i, "");
 
       res.classYear = detectClassYear(t);
+      res.utr = detectUTR(t);
+      // strip any UTR mention so it doesn't pollute the name/school capture
+      t = t.replace(/\([^)]*\bUTR\b[^)]*\)/gi, " ")
+           .replace(/\b\d{1,2}\.\d{1,2}\s*UTR\b/gi, " ")
+           .replace(/\bUTR\s*\d{1,2}\.\d{1,2}\b/gi, " ")
+           .replace(/\s+/g, " ").trim();
 
       let m;
       // Name (School) has entered the [transfer] portal
@@ -293,6 +310,7 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       $("p-name").value = p.name; $("p-prev").value = p.previousSchool;
       $("p-new").value = p.newSchool; $("p-year").value = p.classYear;
       $("p-status").value = p.status || "In Portal"; $("p-home").value = "";
+      $("p-utr").value = p.utr || "";
       $("p-fields").style.display = "block";
       refreshPasteMode();
       $("p-name").focus();
@@ -312,6 +330,7 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
           previousSchool: existing.previousSchool,
           newSchool: $("p-new").value.trim() || existing.newSchool,
           hometown: existing.hometown || $("p-home").value.trim(),
+          utr: $("p-utr").value.trim() || existing.utr || "",
           classYear: existing.classYear || $("p-year").value.trim(),
           dateUpdated: todayISO()
         }), '↻ UPDATE — replace ' + existing.name + "'s existing line in transfers.js with this (same id " +
@@ -320,7 +339,7 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
         setOutput(buildEntry({
           id: Date.now(), name: name, status: status,
           previousSchool: $("p-prev").value.trim(), newSchool: $("p-new").value.trim(),
-          hometown: $("p-home").value.trim(), classYear: $("p-year").value.trim(),
+          hometown: $("p-home").value.trim(), utr: $("p-utr").value.trim(), classYear: $("p-year").value.trim(),
           dateUpdated: todayISO()
         }), "+ New entry — add this line to transfers.js.");
       }
@@ -351,7 +370,7 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
           id: nextId++, name: name,
           previousSchool: parts[1] || "", newSchool: parts[2] || "",
           status: normStatus(parts[3] || ""), classYear: parts[4] || "",
-          hometown: "", dateUpdated: todayISO()
+          hometown: "", utr: parts[5] || "", dateUpdated: todayISO()
         }));
       });
       if (!out.length) { alert("No valid lines found."); return; }
