@@ -12,6 +12,19 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "21", name: "Marek Nano", status: "Committed", previousSchool: "Eastern Kentucky", newSchool: "St. John's", hometown: "Slovakia", classYear: "Fr.", dateUpdated: "2026-05-27" },
+  { id: "22", name: "Asier Ayllon Prado", status: "Committed", previousSchool: "UIndy", newSchool: "MTSU", hometown: "Getafe, Spain", classYear: "So.", dateUpdated: "2026-05-27" },
+  { id: "23", name: "Nikola Puntarič", status: "Committed", previousSchool: "Northern Illinois", newSchool: "UIC", hometown: "Ljubljana, Slovenia", classYear: "So.", dateUpdated: "2026-05-27" },
+  { id: "24", name: "Raffi Ymer", status: "Committed", previousSchool: "Elon", newSchool: "Kentucky", hometown: "Sweden", classYear: "So.", dateUpdated: "2026-05-27" },
+  { id: "25", name: "Jakub Volesky", status: "Committed", previousSchool: "Northern Arizona", newSchool: "VCU", hometown: "Czech Republic", classYear: "", dateUpdated: "2026-05-27" },
+  { id: "26", name: "Andrew Delgado", status: "Committed", previousSchool: "Wake Forest", newSchool: "Georgia", hometown: "", classYear: "R-Fr.", dateUpdated: "2026-05-27" },
+  { id: "27", name: "Oscar Baumgartner", status: "Committed", previousSchool: "UNCW", newSchool: "St. Joseph's", hometown: "Vevey, Switzerland", classYear: "", dateUpdated: "2026-05-27" },
+  { id: "28", name: "Setti Germano", status: "Signed", previousSchool: "Midwestern State", newSchool: "DePaul", hometown: "Carazinho, Brazil", classYear: "", dateUpdated: "2026-05-27" },
+  { id: "29", name: "Jewan Labuschagne", status: "In Portal", previousSchool: "Nicholls State", newSchool: "", hometown: "Pretoria, South Africa", classYear: "So.", dateUpdated: "2026-05-27" },
+  { id: "30", name: "Benjamin Martin", status: "Committed", previousSchool: "Ole Miss", newSchool: "Memphis", hometown: "Nort-sur-Erdre, France", classYear: "", dateUpdated: "2026-05-27" },
+  { id: "31", name: "Sasa Markovic", status: "Committed", previousSchool: "LSU", newSchool: "SMU", hometown: "Loznica, Serbia", classYear: "So.", dateUpdated: "2026-05-27" },
+  { id: "32", name: "Itamar Tapiro", status: "Committed", previousSchool: "Delaware", newSchool: "Coastal Carolina", hometown: "", classYear: "", dateUpdated: "2026-05-27" },
+  { id: "33", name: "Matthieu Coignet", status: "In Portal", previousSchool: "Texas A&M Corpus Christi", newSchool: "", hometown: "Clamart, France", classYear: "", dateUpdated: "2026-05-27" },
   { id: "15", name: "Oskar Grzegorzewski", status: "Committed", previousSchool: "UTSA", newSchool: "UC Santa Barbara", hometown: "Marki, Poland", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "16", name: "Dragos Nicolae Cazacu", status: "In Portal", previousSchool: "Tennessee", newSchool: "", hometown: "Romania", classYear: "Fr.", dateUpdated: "2026-05-27" },
   { id: "17", name: "Yannic Nittmann", status: "Committed", previousSchool: "Clemson", newSchool: "Memphis", hometown: "Cologne, Germany", classYear: "Fr.", dateUpdated: "2026-05-27" },
