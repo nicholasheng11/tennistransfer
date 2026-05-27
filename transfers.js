@@ -12,8 +12,6 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
-  { id: "12", name: "Hamza Nasridinov", status: "Signed", previousSchool: "Auburn", newSchool: "Texas A&M", hometown: "Nurek, Tajikistan", classYear: "Jr.", dateUpdated: "2026-05-27" },
-  { id: "2", name: "Alan Bojarski", status: "Signed", previousSchool: "Auburn", newSchool: "Tennessee", hometown: "Warsaw, Poland", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "88", name: "Matthieu Chambonniere", status: "Committed", previousSchool: "Ole Miss", newSchool: "TCU", hometown: "France", classYear: "", dateUpdated: "2026-05-27" },
   { id: "89", name: "Carson Baker", status: "Signed", previousSchool: "Boise State", newSchool: "Virginia Tech", hometown: "", classYear: "", dateUpdated: "2026-05-27" },
   { id: "90", name: "Théo Mottier", status: "Signed", previousSchool: "Weber State", newSchool: "VCU", hometown: "France", classYear: "", dateUpdated: "2026-05-27" },
@@ -99,6 +97,8 @@ const TRANSFERS = [
   { id: "20", name: "Santi Padilla Cote", status: "Committed", previousSchool: "Stetson", newSchool: "Tulane", hometown: "Plantation, Florida", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "13", name: "Thomas Nelson", status: "Committed", previousSchool: "Old Dominion", newSchool: "Michigan State", hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "14", name: "Ashton Adesoro", status: "Signed", previousSchool: "Western Michigan", newSchool: "Miami (FL)", hometown: "", classYear: "Sr.", dateUpdated: "2026-05-27" },
+  { id: "12", name: "Hamza Nasridinov", status: "Signed", previousSchool: "Auburn", newSchool: "Texas A&M", hometown: "Nurek, Tajikistan", classYear: "Jr.", dateUpdated: "2026-05-27" },
+  { id: "2", name: "Alan Bojarski", status: "Signed", previousSchool: "Auburn", newSchool: "Tennessee", hometown: "Warsaw, Poland", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "10", name: "Oscar Lacides",   status: "Committed",  previousSchool: "Oklahoma",  newSchool: "Tennessee",          hometown: "France", classYear: "Sr.", dateUpdated: "2026-05-27" },
   { id: "1",  name: "Orel Kihmi",       status: "Committed",  previousSchool: "Oklahoma",   newSchool: "Tennessee",    hometown: "Israel", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "8",  name: "Hank Trondson",       status: "Committed",  previousSchool: "Oklahoma",  newSchool: "Oklahoma State",          hometown: "Nashville, Tennessee", classYear: "Jr.", dateUpdated: "2026-05-27" },
