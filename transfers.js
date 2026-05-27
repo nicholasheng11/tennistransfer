@@ -12,8 +12,8 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
-  { id: "12", name: "Hamza Nasridinov", status: "Signed", previousSchool: "Auburn", newSchool: "Texas A&M", hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
-  { id: "2", name: "Alan Bojarski", status: "Signed", previousSchool: "Auburn", newSchool: "Tennessee", hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
+  { id: "12", name: "Hamza Nasridinov", status: "Signed", previousSchool: "Auburn", newSchool: "Texas A&M", hometown: "Nurek, Tajikistan", classYear: "Jr.", dateUpdated: "2026-05-27" },
+  { id: "2", name: "Alan Bojarski", status: "Signed", previousSchool: "Auburn", newSchool: "Tennessee", hometown: "Warsaw, Poland", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "62", name: "Yazid Lahjomri", status: "In Portal", previousSchool: "UT Arlington", newSchool: "", hometown: "Rabat, Morocco", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "63", name: "Anirudh Nallaparaju", status: "In Portal", previousSchool: "Marist", newSchool: "", hometown: "Lyneham, Australia", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "64", name: "Maxime Dubouch", status: "Signed", previousSchool: "Memphis", newSchool: "Georgia", hometown: "France", classYear: "Gr.", dateUpdated: "2026-05-27" },
@@ -89,14 +89,14 @@ const TRANSFERS = [
   { id: "20", name: "Santi Padilla Cote", status: "Committed", previousSchool: "Stetson", newSchool: "Tulane", hometown: "Plantation, Florida", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "13", name: "Thomas Nelson", status: "Committed", previousSchool: "Old Dominion", newSchool: "Michigan State", hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "14", name: "Ashton Adesoro", status: "Signed", previousSchool: "Western Michigan", newSchool: "Miami (FL)", hometown: "", classYear: "Sr.", dateUpdated: "2026-05-27" },
-  { id: "10", name: "Oscar Lacides",   status: "Committed",  previousSchool: "Oklahoma",  newSchool: "Tennessee",          hometown: "", classYear: "Sr.", dateUpdated: "2026-05-27" },
-  { id: "1",  name: "Orel Kihmi",       status: "Committed",  previousSchool: "Oklahoma",   newSchool: "Tennessee",    hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
-  { id: "8",  name: "Hank Trondson",       status: "Committed",  previousSchool: "Oklahoma",  newSchool: "Oklahoma State",          hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
+  { id: "10", name: "Oscar Lacides",   status: "Committed",  previousSchool: "Oklahoma",  newSchool: "Tennessee",          hometown: "France", classYear: "Sr.", dateUpdated: "2026-05-27" },
+  { id: "1",  name: "Orel Kihmi",       status: "Committed",  previousSchool: "Oklahoma",   newSchool: "Tennessee",    hometown: "Israel", classYear: "Jr.", dateUpdated: "2026-05-27" },
+  { id: "8",  name: "Hank Trondson",       status: "Committed",  previousSchool: "Oklahoma",  newSchool: "Oklahoma State",          hometown: "Nashville, Tennessee", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "5",  name: "Jan Kobierski",    status: "Committed",  previousSchool: "Tennessee", newSchool: "San Diego State",   hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
-  { id: "9",  name: "Piotr Siekanowicz",     status: "Committed",  previousSchool: "Tennessee",  newSchool: "San Diego State", hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
+  { id: "9",  name: "Piotr Siekanowicz",     status: "Committed",  previousSchool: "Tennessee",  newSchool: "San Diego State", hometown: "Poland", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "3",  name: "Ariel Zauber",  status: "Committed",     previousSchool: "Wake Forest",     newSchool: "Indiana",       hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "7",  name: "Blake Anderson",     status: "Signed",     previousSchool: "Baylor",       newSchool: "San Diego State",  hometown: "", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "6",  name: "Mats Bredschneijder",     status: "Committed",  previousSchool: "VCU",    newSchool: "Hawaii",          hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
-  { id: "11", name: "Arsene Pougault",     status: "Signed",     previousSchool: "Arkansas, Charlotte",  newSchool: "Boise State",   hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
-  { id: "4",  name: "Nicholas Heng",      status: "Signed",  previousSchool: "Auburn", newSchool: "Michigan",        hometown: "", classYear: "R-Sr.", dateUpdated: "2026-05-27" },
+  { id: "11", name: "Arsene Pougault",     status: "Signed",     previousSchool: "Arkansas, Charlotte",  newSchool: "Boise State",   hometown: "France", classYear: "Jr.", dateUpdated: "2026-05-27" },
+  { id: "4",  name: "Nicholas Heng",      status: "Signed",  previousSchool: "Auburn", newSchool: "Michigan",        hometown: "Madison, Alabama", classYear: "R-Sr.", dateUpdated: "2026-05-27" },
 ];
