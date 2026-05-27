@@ -360,11 +360,15 @@
       }
 
       grid.innerHTML = players.map(p => {
-        const rank = rankOf(p.newSchool);
-        const rankTag = (rank != null) ? '<span class="rank">#' + rank + '</span>' : '';
+        const newRank = rankOf(p.newSchool);
+        const newRankTag = (newRank != null) ? '<span class="rank">#' + newRank + '</span>' : '';
+        // Previous-school rank — skip lookup for multi-school strings like "Arkansas, Charlotte".
+        const prevRank = p.previousSchool.includes(",") ? null : rankOf(p.previousSchool);
+        const prevRankTag = (prevRank != null) ? '<span class="rank">#' + prevRank + '</span>' : '';
+        const prev = esc(p.previousSchool) + prevRankTag;
         const schools = p.newSchool
-          ? esc(p.previousSchool) + '<span class="arrow">&rarr;</span>' + esc(p.newSchool) + rankTag
-          : esc(p.previousSchool);
+          ? prev + '<span class="arrow">&rarr;</span>' + esc(p.newSchool) + newRankTag
+          : prev;
         const year = p.classYear ? ' <span class="year">&middot; ' + esc(p.classYear) + '</span>' : "";
         // Bottom meta line: hometown (if present) + relative "Updated ..." with exact-date tooltip.
         const updated = '<span class="updated" title="' + esc(p.dateUpdated) + '">' + esc(relativeUpdated(p.dateUpdated)) + '</span>';
