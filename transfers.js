@@ -33,3 +33,4 @@ const TRANSFERS = [
   { id: "6",  name: "Mats Bredschneijder",     status: "Committed",  previousSchool: "VCU",    newSchool: "Hawaii",          hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "11", name: "Arsene Pougault",     status: "Signed",     previousSchool: "Arkansas, Charlotte",  newSchool: "Boise State",   hometown: "", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "4",  name: "Nicholas Heng",      status: "Signed",  previousSchool: "Auburn", newSchool: "Michigan",        hometown: "", classYear: "R-Sr.", dateUpdated: "2026-05-27" },
+];
