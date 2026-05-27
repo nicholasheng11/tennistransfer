@@ -180,6 +180,8 @@
           <option value="all">All schools</option>
           <option value="to">To Power 4</option>
           <option value="from">From Power 4</option>
+          <option value="tomid">To Mid-Major</option>
+          <option value="frommid">From Mid-Major</option>
         </select>
       </div>
     </div>
@@ -222,6 +224,11 @@
       "Boston College","California","Cal","Clemson","Duke","Florida State","Georgia Tech","Louisville","Miami","Miami (FL)","NC State","North Carolina","Notre Dame","Pitt","Pittsburgh","SMU","Stanford","Syracuse","Virginia","Virginia Tech","Wake Forest"
     ]);
     const isP4 = school => POWER4.has(school);
+
+    // Known non-D1 (D2 / JUCO / NAIA) schools that appear in the data — excluded from "Mid-Major"
+    // (which means a Division I program that isn't Power 4). Add to this list if a non-D1 school shows up.
+    const NON_D1 = new Set(["UIndy","Midwestern State","West Alabama","Saint Leo","Collin College","Middle Georgia State","Mississippi College"]);
+    const isMidMajor = school => !!school && !isP4(school) && !NON_D1.has(school);
 
     // Turn a status like "In Portal" into a CSS class like "inportal".
     function badgeClass(status) {
@@ -304,11 +311,15 @@
             .toLowerCase().includes(searchText));
       }
 
-      // 2b. Power 4 filter: "to" = committed/signed at a P4; "from" = transferring out of a P4
+      // 2b. School filter: Power 4 or Mid-Major, by destination ("to") or origin ("from")
       if (p4Filter === "to") {
         players = players.filter(p => isP4(p.newSchool));
       } else if (p4Filter === "from") {
         players = players.filter(p => isP4(p.previousSchool));
+      } else if (p4Filter === "tomid") {
+        players = players.filter(p => isMidMajor(p.newSchool));
+      } else if (p4Filter === "frommid") {
+        players = players.filter(p => isMidMajor(p.previousSchool));
       }
 
       // 3. sort (empty new-school values sort to the end for "By new school")
