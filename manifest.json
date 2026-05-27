@@ -1,0 +1,12 @@
+{
+  "name": "D1 Men's Tennis Transfer Tracker",
+  "short_name": "Tennis Transfers",
+  "description": "Live tracker of D1 men's tennis transfer portal entries, commitments, and signings.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f5f7",
+  "theme_color": "#11203a",
+  "icons": [
+    { "src": "icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" }
+  ]
+}

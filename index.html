@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#11203a" />
+  <title>D1 Men's Tennis Transfer Tracker</title>
+
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Tennis Transfers" />
+
+  <style>
+    /* ---- Colors & basics ---------------------------------------------- */
+    :root {
+      --navy: #11203a;
+      --bg: #f4f5f7;
+      --card: #ffffff;
+      --text: #1a1d23;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #16a34a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    /* ---- Sticky header with the title, search and filter buttons ------- */
+    header {
+      background: var(--navy);
+      color: #fff;
+      padding: 18px 16px 14px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 { font-size: 19px; font-weight: 700; }
+    header p  { font-size: 13px; opacity: 0.75; margin-top: 2px; }
+
+    .search {
+      margin-top: 12px;
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .filter-btn {
+      flex: 0 0 auto;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      border: none;
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .filter-btn.active { background: #fff; color: var(--navy); font-weight: 600; }
+
+    /* ---- Result count + the grid of player cards ----------------------- */
+    .count { color: var(--muted); font-size: 13px; padding: 14px 16px 0; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      padding: 12px 16px 40px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 15px;
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .name { font-size: 16px; font-weight: 700; }
+    .schools { margin-top: 6px; font-size: 14px; color: var(--text); }
+    .arrow { color: var(--accent); font-weight: 700; padding: 0 4px; }
+    .meta  { margin-top: 8px; font-size: 12px; color: var(--muted); }
+
+    /* ---- Status badges (one color per status) -------------------------- */
+    .badge {
+      flex: 0 0 auto;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge.inportal  { background: #fef3c7; color: #92400e; }
+    .badge.committed { background: #dcfce7; color: #166534; }
+    .badge.signed    { background: #dbeafe; color: #1e40af; }
+    .badge.withdrawn { background: #e5e7eb; color: #4b5563; }
+
+    .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>D1 Men's Tennis Transfer Tracker</h1>
+    <p>Updated by hand &middot; tap a filter or search a name</p>
+    <input id="search" class="search" type="text" placeholder="Search player or school..." />
+    <div id="filters" class="filters"></div>
+  </header>
+
+  <div id="count" class="count"></div>
+  <div id="grid" class="grid"></div>
+
+  <!-- Your data file loads first, then the code that displays it -->
+  <script src="transfers.js"></script>
+  <script>
+    // The four statuses, plus "All", in the order they appear as filter buttons.
+    const STATUSES = ["All", "In Portal", "Committed", "Signed", "Withdrawn"];
+
+    // What's currently selected. These two variables drive everything on screen.
+    let activeFilter = "All";
+    let searchText = "";
+
+    // Grab the page elements we'll be updating.
+    const grid = document.getElementById("grid");
+    const countEl = document.getElementById("count");
+    const filtersEl = document.getElementById("filters");
+    const searchEl = document.getElementById("search");
+
+    // Turn a status like "In Portal" into a CSS class like "inportal".
+    function badgeClass(status) {
+      return status.toLowerCase().replace(/\s+/g, "");
+    }
+
+    // Keep names/schools safe to drop into HTML.
+    function esc(str) {
+      return String(str).replace(/[&<>"]/g, c =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    }
+
+    // Build the filter buttons once.
+    STATUSES.forEach(status => {
+      const btn = document.createElement("button");
+      btn.className = "filter-btn" + (status === activeFilter ? " active" : "");
+      btn.textContent = status;
+      btn.onclick = () => {
+        activeFilter = status;
+        document.querySelectorAll(".filter-btn")
+          .forEach(b => b.classList.toggle("active", b.textContent === status));
+        render();
+      };
+      filtersEl.appendChild(btn);
+    });
+
+    // Update searchText as the user types.
+    searchEl.oninput = () => { searchText = searchEl.value.toLowerCase(); render(); };
+
+    // The main function: decide which players to show, then draw them.
+    function render() {
+      let players = TRANSFERS.slice(); // copy so we don't reorder the original
+
+      // 1. filter by the selected status
+      if (activeFilter !== "All") {
+        players = players.filter(p => p.status === activeFilter);
+      }
+
+      // 2. filter by the search box (name or either school)
+      if (searchText) {
+        players = players.filter(p =>
+          (p.name + " " + p.previousSchool + " " + p.newSchool)
+            .toLowerCase().includes(searchText));
+      }
+
+      // 3. newest first
+      players.sort((a, b) => b.dateUpdated.localeCompare(a.dateUpdated));
+
+      // 4. show the count
+      countEl.textContent = players.length + (players.length === 1 ? " player" : " players");
+
+      // 5. draw a card for each player (or an empty message)
+      if (players.length === 0) {
+        grid.innerHTML = "";
+        grid.insertAdjacentHTML("beforeend",
+          '<div class="empty">No players match. Try a different filter or search.</div>');
+        return;
+      }
+
+      grid.innerHTML = players.map(p => {
+        const schools = p.newSchool
+          ? esc(p.previousSchool) + '<span class="arrow">&rarr;</span>' + esc(p.newSchool)
+          : esc(p.previousSchool);
+        return `
+          <div class="card">
+            <div class="card-top">
+              <div class="name">${esc(p.name)}</div>
+              <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
+            </div>
+            <div class="schools">${schools}</div>
+            <div class="meta">${esc(p.classYear)}${p.hometown ? " &middot; " + esc(p.hometown) : ""}</div>
+          </div>`;
+      }).join("");
+    }
+
+    render(); // draw everything for the first time
+  </script>
+</body>
+</html>

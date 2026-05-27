@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#11203a" />
+  <title>Add Player — Tennis Transfer Tracker</title>
+  <style>
+    :root { --navy:#11203a; --bg:#f4f5f7; --border:#d0d5dd; --accent:#16a34a; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:#1a1d23; line-height:1.45; }
+    header { background:var(--navy); color:#fff; padding:18px 16px; }
+    header h1 { font-size:19px; }
+    header p { font-size:13px; opacity:.8; margin-top:2px; }
+    .wrap { max-width:560px; margin:0 auto; padding:18px 16px 60px; }
+    label { display:block; font-size:13px; font-weight:600; margin:14px 0 5px; }
+    input, select { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:9px; font-size:15px; background:#fff; }
+    button { margin-top:20px; width:100%; background:var(--accent); color:#fff; border:none; padding:13px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; }
+    .out { margin-top:20px; display:none; }
+    textarea { width:100%; height:90px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; padding:10px; border:1px solid var(--border); border-radius:9px; background:#fff; }
+    .copy { background:var(--navy); margin-top:10px; }
+    .steps { background:#fff; border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-top:24px; font-size:14px; }
+    .steps h2 { font-size:14px; margin-bottom:8px; }
+    .steps ol { margin-left:18px; }
+    .steps li { margin:5px 0; }
+    code { background:#eef0f3; padding:1px 5px; border-radius:5px; font-size:13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Add a Player</h1>
+    <p>Private tool &middot; fill this in, copy the line, paste it into transfers.js</p>
+  </header>
+
+  <div class="wrap">
+    <label>Player name</label>
+    <input id="name" placeholder="e.g. Carlos Méndez" />
+
+    <label>Status</label>
+    <select id="status">
+      <option>In Portal</option>
+      <option>Committed</option>
+      <option>Signed</option>
+      <option>Withdrawn</option>
+    </select>
+
+    <label>Previous school</label>
+    <input id="previousSchool" placeholder="e.g. Florida" />
+
+    <label>New school</label>
+    <input id="newSchool" placeholder="Leave blank if still In Portal" />
+
+    <label>Class year</label>
+    <input id="classYear" placeholder="e.g. Jr." />
+
+    <label>Hometown (optional)</label>
+    <input id="hometown" placeholder="e.g. Madrid, Spain" />
+
+    <button id="gen">Generate entry</button>
+
+    <div class="out" id="out">
+      <label>Your entry (already formatted — safe to paste):</label>
+      <textarea id="result" readonly></textarea>
+      <button class="copy" id="copy">Copy to clipboard</button>
+    </div>
+
+    <div class="steps">
+      <h2>What to do with it</h2>
+      <ol>
+        <li>Click <strong>Generate entry</strong>, then <strong>Copy</strong>.</li>
+        <li>Open <code>transfers.js</code> in Notepad.</li>
+        <li>Paste it on its own line right under <code>const TRANSFERS = [</code>.</li>
+        <li>Save the file.</li>
+        <li>Drag the folder onto Netlify's <strong>Deploys</strong> tab to publish.</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    // Today's date as YYYY-MM-DD (controls newest-first ordering on the site).
+    function todayISO() {
+      const d = new Date();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return d.getFullYear() + "-" + m + "-" + day;
+    }
+
+    // Build the entry. JSON.stringify on each value guarantees valid, safely-escaped
+    // text — this is what removes the quote/comma mistakes that blank the page.
+    $("gen").onclick = () => {
+      const name = $("name").value.trim();
+      if (!name) { alert("Please enter a player name."); return; }
+      const entry =
+        "  { id: " + JSON.stringify(String(Date.now())) +
+        ", name: " + JSON.stringify(name) +
+        ", status: " + JSON.stringify($("status").value) +
+        ", previousSchool: " + JSON.stringify($("previousSchool").value.trim()) +
+        ", newSchool: " + JSON.stringify($("newSchool").value.trim()) +
+        ", hometown: " + JSON.stringify($("hometown").value.trim()) +
+        ", classYear: " + JSON.stringify($("classYear").value.trim()) +
+        ", dateUpdated: " + JSON.stringify(todayISO()) + " },";
+      $("result").value = entry;
+      $("out").style.display = "block";
+    };
+
+    $("copy").onclick = async () => {
+      const ta = $("result");
+      try {
+        await navigator.clipboard.writeText(ta.value);
+      } catch (e) {
+        ta.focus(); ta.select();
+        try { document.execCommand("copy"); } catch (_) {}
+      }
+      $("copy").textContent = "Copied!";
+      setTimeout(() => $("copy").textContent = "Copy to clipboard", 1500);
+    };
+  </script>
+</body>
+</html>
