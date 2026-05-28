@@ -34,7 +34,7 @@ const TRANSFERS = [
   { id: "154", gender: "M", name: "Hoang Anh Pham", status: "In Portal", previousSchool: "South Carolina State", newSchool: "", country: "Vietnam", utr: "12.00", classYear: "Fr.", dateUpdated: "2026-05-28" },
   { id: "153", gender: "M", name: "Maxime Aremon", status: "In Portal", previousSchool: "Cleveland State", newSchool: "", country: "France", utr: "11.66", classYear: "", dateUpdated: "2026-05-28" },
   { id: "152", gender: "M", name: "Francisco Duran", status: "In Portal", previousSchool: "Saint Mary's", newSchool: "", country: "Chile", utr: "11.52", classYear: "So.", dateUpdated: "2026-05-28" },
-  { id: "151", gender: "M", name: "Carlos Braun Simo", status: "Committed", previousSchool: "Quinnipiac", newSchool: "Boston College", country: "", utr: "12.13", classYear: "", dateUpdated: "2026-05-28" },
+  { id: "151", gender: "M", name: "Carlos Braun Simo", status: "Committed", previousSchool: "Quinnipiac", newSchool: "Boston College", country: "Switzerland", utr: "12.13", classYear: "", dateUpdated: "2026-05-28" },
   { id: "150", gender: "M", name: "Leon Peranovic", status: "In Portal", previousSchool: "Kennesaw State", newSchool: "", country: "Germany", utr: "12.37", classYear: "Fr.", dateUpdated: "2026-05-28" },
   { id: "149", gender: "M", name: "Will Ribero", status: "In Portal", previousSchool: "Louisiana-Lafayette", newSchool: "", country: "Colombia", utr: "", classYear: "", dateUpdated: "2026-05-28" },
   { id: "148", gender: "M", name: "Andreas Nygaard", status: "In Portal", previousSchool: "Dayton", newSchool: "", country: "Norway", utr: "", classYear: "So.", dateUpdated: "2026-05-28" },
