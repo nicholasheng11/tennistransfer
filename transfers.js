@@ -193,7 +193,7 @@ const TRANSFERS = [
   { id: "178", gender: "M", name: "Sander Paradis", status: "In Portal", previousSchool: "Idaho", newSchool: "", country: "Netherlands", utr: "11.61", classYear: "Fr.", dateUpdated: "2026-05-04" },
   { id: "177", gender: "M", name: "Maxime Salesses", status: "In Portal", previousSchool: "Texas A&M Corpus Christi", newSchool: "", country: "France", utr: "11.51", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "176", gender: "M", name: "Gustav Andersson", status: "In Portal", previousSchool: "Georgia State", newSchool: "", country: "Sweden", utr: "11.42", classYear: "Fr.", dateUpdated: "2026-05-04" },
-  { id: "175", gender: "M", name: "Bastian Zamora", status: "In Portal", previousSchool: "South Carolina State", newSchool: "", country: "", utr: "11.94", classYear: "", dateUpdated: "2026-05-04" },
-  { id: "174", gender: "M", name: "Dani López", status: "In Portal", previousSchool: "Longwood", newSchool: "", country: "", utr: "11.80", classYear: "", dateUpdated: "2026-05-04" },
+  { id: "175", gender: "M", name: "Bastian Zamora", status: "In Portal", previousSchool: "South Carolina State", newSchool: "", country: "Chile", utr: "11.94", classYear: "", dateUpdated: "2026-05-04" },
+  { id: "174", gender: "M", name: "Dani López", status: "In Portal", previousSchool: "Longwood", newSchool: "", country: "Spain", utr: "11.80", classYear: "", dateUpdated: "2026-05-04" },
   { id: "4", gender: "M",  name: "Nicholas Heng",      status: "Committed",  previousSchool: "Auburn", newSchool: "Michigan",        hometown: "Madison, Alabama", country: "Alabama", utr: "13.27", classYear: "R-Sr.", dateUpdated: "2026-05-27" },
 ];
