@@ -150,9 +150,7 @@
       letter-spacing: 0.03em;
     }
     .badge.inportal  { background: #dbeafe; color: #1e40af; }
-    .badge.committed { background: #fef3c7; color: #92400e; }
-    .badge.signed    { background: #d1fae5; color: #065f46; }
-    .badge.withdrawn { background: #f3f4f6; color: #6b7280; }
+    .badge.committed { background: #d1fae5; color: #065f46; }
 
     .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
 
@@ -204,7 +202,7 @@
   <script src="transfers.js"></script>
   <script>
     // The four statuses, plus "All", in the order they appear as filter buttons.
-    const STATUSES = ["All", "In Portal", "Committed", "Signed", "Withdrawn"];
+    const STATUSES = ["All", "In Portal", "Committed"];
 
     // What's currently selected. These drive everything on screen.
     let activeFilter = "All";

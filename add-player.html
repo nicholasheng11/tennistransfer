@@ -84,7 +84,7 @@
       <input id="s-name" placeholder="e.g. Carlos Méndez" />
       <label>Status</label>
       <select id="s-status">
-        <option>In Portal</option><option>Committed</option><option>Signed</option><option>Withdrawn</option>
+        <option>In Portal</option><option>Committed</option>
       </select>
       <label>Previous school</label>
       <input id="s-prev" placeholder="e.g. Florida" />
@@ -111,7 +111,7 @@
         <input id="p-name" />
         <label>Status</label>
         <select id="p-status">
-          <option>In Portal</option><option>Committed</option><option>Signed</option><option>Withdrawn</option>
+          <option>In Portal</option><option>Committed</option>
         </select>
         <label>Previous school</label>
         <input id="p-prev" />
@@ -133,7 +133,7 @@
       <textarea id="b-input" placeholder="Carlos Méndez, Florida, Auburn, C, Jr.
 Jonas Weber, Ohio State, , P, So.
 Diego Costa, Texas, TCU, S, Gr."></textarea>
-      <div class="hint">Status shortcuts: P/portal, C/committed, S/signed, W/withdrawn. New school, UTR, and country may be blank. IDs auto-number from your highest existing ID.</div>
+      <div class="hint">Status shortcuts: P/portal, C/committed (S/signed also maps to Committed). New school, UTR, and country may be blank. IDs auto-number from your highest existing ID.</div>
       <button class="action" id="b-gen">Generate entries</button>
     </div>
 
@@ -292,9 +292,9 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       if ((m = t.match(/^(.+?)\s+has committed to\s+(.+?)[.!]?$/i))) {
         res.name = clean(m[1]); res.newSchool = clean(stripQualifier(m[2])); res.status = "Committed"; return res;
       }
-      // Name has signed with School
+      // Name has signed with School ("signed" now maps to Committed under the simplified status system)
       if ((m = t.match(/^(.+?)\s+has signed with\s+(.+?)[.!]?$/i))) {
-        res.name = clean(m[1]); res.newSchool = clean(stripQualifier(m[2])); res.status = "Signed"; return res;
+        res.name = clean(m[1]); res.newSchool = clean(stripQualifier(m[2])); res.status = "Committed"; return res;
       }
       // Fallback: take a leading capitalized run as the name
       if ((m = t.match(/^([A-Z][\w'.-]+(?:\s+[A-Z][\w'.-]+){0,2})/))) { res.name = clean(m[1]); }
@@ -305,13 +305,13 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       const existing = findExisting($("p-name").value);
       const status = $("p-status").value;
       const note = $("p-mode");
-      if (existing && (status === "Committed" || status === "Signed")) {
+      if (existing && status === "Committed") {
         note.className = "mode-note update";
         note.textContent = '↻ Update mode: matches "' + existing.name + '" already in the tracker (id ' +
           JSON.stringify(String(existing.id)) + '). Generating a REPLACEMENT line — swap it for that player\'s existing line, don\'t add a new one.';
       } else if (existing) {
         note.className = "mode-note warn";
-        note.textContent = '⚠ A player named "' + existing.name + '" already exists. This makes a NEW entry (status isn\'t Committed/Signed) — check for duplicates.';
+        note.textContent = '⚠ A player named "' + existing.name + '" already exists. This makes a NEW entry (status isn\'t Committed) — check for duplicates.';
       } else {
         note.className = "mode-note new";
         note.textContent = "+ New entry.";
@@ -336,7 +336,7 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       if (!name) { alert("Name is required."); return; }
       const status = $("p-status").value;
       const existing = findExisting(name);
-      if (existing && (status === "Committed" || status === "Signed")) {
+      if (existing && status === "Committed") {
         // UPDATE: keep existing id/previousSchool/classYear/country; apply new status + newSchool; today's date
         setOutput(buildEntry({
           id: existing.id, name: existing.name, status: status,
@@ -362,9 +362,7 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
     function normStatus(s) {
       const x = (s || "").trim().toLowerCase();
       if (x === "p" || x === "portal" || x === "in portal") return "In Portal";
-      if (x === "c" || x === "committed") return "Committed";
-      if (x === "s" || x === "signed") return "Signed";
-      if (x === "w" || x === "withdrawn") return "Withdrawn";
+      if (x === "c" || x === "committed" || x === "s" || x === "signed") return "Committed";
       return s ? s.trim() : "";
     }
 
