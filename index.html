@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#11203a" />
-  <title>D1 Men's Tennis Transfer Tracker</title>
+  <title>D1 Tennis Transfer Tracker</title>
 
   <link rel="icon" type="image/svg+xml" href="icon.svg" />
   <link rel="manifest" href="manifest.json" />
@@ -84,6 +84,8 @@
     }
     .filter-btn.active { background: #fff; color: var(--navy); font-weight: 600; }
     .pill-count { font-size: 12px; opacity: 0.6; margin-left: 4px; font-weight: 600; }
+    /* Gender pills sit on their own row above the status pills. */
+    #gender-filters { margin-top: 10px; }
 
     .sortwrap { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; }
     .sortwrap label { font-size: 13px; color: #fff; opacity: 0.75; }
@@ -164,10 +166,11 @@
 
 <body>
   <header>
-    <h1>🎾 D1 Men's Tennis Transfer Tracker</h1>
+    <h1>🎾 D1 Tennis Transfer Tracker</h1>
     <p id="subtitle"></p>
     <p class="disclaimer">UTRs reflect each player's rating at the time their card was last updated, not live ratings. ITA doubles rankings reflect each player's team at their previous school.</p>
     <input id="search" class="search" type="text" placeholder="Search player or school..." />
+    <div id="gender-filters" class="filters"></div>
     <div class="controls">
       <div id="filters" class="filters"></div>
       <div class="sortwrap">
@@ -205,10 +208,13 @@
   <script src="doubles-w.js"></script>
   <script src="transfers.js"></script>
   <script>
-    // The four statuses, plus "All", in the order they appear as filter buttons.
+    // The two statuses, plus "All", in the order they appear as filter buttons.
     const STATUSES = ["All", "In Portal", "Committed"];
+    // Gender pills (top row). Maps to player.gender = "M" / "W".
+    const GENDERS = ["All", "Men's", "Women's"];
 
     // What's currently selected. These drive everything on screen.
+    let activeGender = "All";
     let activeFilter = "All";
     let searchText = "";
     let sortBy = "newest";
@@ -218,6 +224,7 @@
     const grid = document.getElementById("grid");
     const countEl = document.getElementById("count");
     const filtersEl = document.getElementById("filters");
+    const genderFiltersEl = document.getElementById("gender-filters");
     const searchEl = document.getElementById("search");
     const sortEl = document.getElementById("sort");
     const p4El = document.getElementById("p4");
@@ -303,18 +310,51 @@
       return "Updated " + mon[then.getMonth()] + " " + then.getDate();
     }
 
-    // How many players have a given status (drives the pill counts).
+    // Does a player match the selected gender pill? "All" matches everyone.
+    function genderMatch(p, g) {
+      if (g === "All") return true;
+      if (g === "Men's") return p.gender === "M";
+      if (g === "Women's") return p.gender === "W";
+      return true;
+    }
+    // Total count of players for a given gender pill (drives the gender pill counts — static, not affected by status).
+    function genderCount(g) {
+      return TRANSFERS.filter(p => genderMatch(p, g)).length;
+    }
+    // How many players have a given status WITHIN the currently selected gender (drives status pill counts).
     function statusCount(status) {
-      return status === "All"
-        ? TRANSFERS.length
-        : TRANSFERS.filter(p => p.status === status).length;
+      const within = TRANSFERS.filter(p => genderMatch(p, activeGender));
+      return status === "All" ? within.length : within.filter(p => p.status === status).length;
+    }
+    // Refresh status pill labels (called whenever the gender selection changes).
+    function refreshStatusPills() {
+      document.querySelectorAll('.filter-btn[data-status]').forEach(btn => {
+        const status = btn.dataset.status;
+        btn.innerHTML = esc(status) + ' <span class="pill-count">' + statusCount(status) + '</span>';
+      });
     }
 
     // Subtitle shows the most recent dateUpdated across all players.
     const latest = TRANSFERS.reduce((mx, p) => (p.dateUpdated > mx ? p.dateUpdated : mx), "");
     subtitleEl.textContent = latest ? "Last updated: " + formatLong(latest) : "Updated by hand";
 
-    // Build the filter buttons, each with its count (e.g. "Committed 7").
+    // Build the gender filter buttons (top row).
+    GENDERS.forEach(g => {
+      const btn = document.createElement("button");
+      btn.className = "filter-btn" + (g === activeGender ? " active" : "");
+      btn.dataset.gender = g;
+      btn.innerHTML = esc(g) + ' <span class="pill-count">' + genderCount(g) + '</span>';
+      btn.onclick = () => {
+        activeGender = g;
+        document.querySelectorAll('.filter-btn[data-gender]')
+          .forEach(b => b.classList.toggle("active", b.dataset.gender === g));
+        refreshStatusPills();
+        render();
+      };
+      genderFiltersEl.appendChild(btn);
+    });
+
+    // Build the status filter buttons (row below gender), each with its count.
     STATUSES.forEach(status => {
       const btn = document.createElement("button");
       btn.className = "filter-btn" + (status === activeFilter ? " active" : "");
@@ -322,7 +362,7 @@
       btn.innerHTML = esc(status) + ' <span class="pill-count">' + statusCount(status) + '</span>';
       btn.onclick = () => {
         activeFilter = status;
-        document.querySelectorAll(".filter-btn")
+        document.querySelectorAll('.filter-btn[data-status]')
           .forEach(b => b.classList.toggle("active", b.dataset.status === status));
         render();
       };
@@ -336,6 +376,11 @@
     // The main function: decide which players to show, then draw them.
     function render() {
       let players = TRANSFERS.slice(); // copy so we don't reorder the original
+
+      // 0. filter by gender (applied first, before status)
+      if (activeGender !== "All") {
+        players = players.filter(p => genderMatch(p, activeGender));
+      }
 
       // 1. filter by the selected status
       if (activeFilter !== "All") {
@@ -405,7 +450,10 @@
 
       // 5. draw a card for each player (or an empty message)
       if (players.length === 0) {
-        grid.innerHTML = '<div class="empty">No players match. Try a different filter or search.</div>';
+        const msg = (activeGender === "Women's")
+          ? "No women's players yet — coverage launching soon."
+          : "No players match. Try a different filter or search.";
+        grid.innerHTML = '<div class="empty">' + esc(msg) + '</div>';
         return;
       }
 
