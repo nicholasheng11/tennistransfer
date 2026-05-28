@@ -242,22 +242,30 @@
     const NON_D1 = new Set(["UIndy","Midwestern State","West Alabama","Saint Leo","Collin College","Middle Georgia State","Mississippi College"]);
     const isMidMajor = school => !!school && !isP4(school) && !NON_D1.has(school);
 
-    // ITA team rankings (rankings.js). Schools not listed are unranked.
-    const RANKINGS = (typeof ITA_RANKINGS_M !== "undefined" && ITA_RANKINGS_M) ? ITA_RANKINGS_M : {};
-    const rankOf = school => (school && RANKINGS[school] != null) ? RANKINGS[school] : null;
-
-    // ITA singles rankings (singles-m.js). Players not in top 125 are unranked.
-    const SINGLES = (typeof ITA_SINGLES_M !== "undefined" && ITA_SINGLES_M) ? ITA_SINGLES_M : {};
-    const singlesRankOf = name => {
-      const key = (name || "").toLowerCase();
-      return (key && SINGLES[key] != null) ? SINGLES[key] : null;
+    // ITA team rankings (M + W). Lookup picks the right table by player gender; missing gender falls back to M.
+    const RANKINGS_M = (typeof ITA_RANKINGS_M !== "undefined" && ITA_RANKINGS_M) ? ITA_RANKINGS_M : {};
+    const RANKINGS_W = (typeof ITA_RANKINGS_W !== "undefined" && ITA_RANKINGS_W) ? ITA_RANKINGS_W : {};
+    const rankOf = (school, gender) => {
+      const table = (gender === "W") ? RANKINGS_W : RANKINGS_M;
+      return (school && table[school] != null) ? table[school] : null;
     };
 
-    // ITA doubles rankings (doubles-m.js). Each player on a ranked team gets the same rank.
-    const DOUBLES = (typeof ITA_DOUBLES_M !== "undefined" && ITA_DOUBLES_M) ? ITA_DOUBLES_M : {};
-    const doublesRankOf = name => {
+    // ITA singles rankings (M + W). Same gender routing.
+    const SINGLES_M = (typeof ITA_SINGLES_M !== "undefined" && ITA_SINGLES_M) ? ITA_SINGLES_M : {};
+    const SINGLES_W = (typeof ITA_SINGLES_W !== "undefined" && ITA_SINGLES_W) ? ITA_SINGLES_W : {};
+    const singlesRankOf = (name, gender) => {
       const key = (name || "").toLowerCase();
-      return (key && DOUBLES[key] != null) ? DOUBLES[key] : null;
+      const table = (gender === "W") ? SINGLES_W : SINGLES_M;
+      return (key && table[key] != null) ? table[key] : null;
+    };
+
+    // ITA doubles rankings (M + W). Same gender routing.
+    const DOUBLES_M = (typeof ITA_DOUBLES_M !== "undefined" && ITA_DOUBLES_M) ? ITA_DOUBLES_M : {};
+    const DOUBLES_W = (typeof ITA_DOUBLES_W !== "undefined" && ITA_DOUBLES_W) ? ITA_DOUBLES_W : {};
+    const doublesRankOf = (name, gender) => {
+      const key = (name || "").toLowerCase();
+      const table = (gender === "W") ? DOUBLES_W : DOUBLES_M;
+      return (key && table[key] != null) ? table[key] : null;
     };
 
     // Turn a status like "In Portal" into a CSS class like "inportal".
@@ -357,7 +365,7 @@
         // By destination ITA rank. Ranked schools first (asc for High, desc for Low);
         // unranked / In Portal sort to the bottom, newest-first among themselves.
         players.sort((a, b) => {
-          const ra = rankOf(a.newSchool), rb = rankOf(b.newSchool);
+          const ra = rankOf(a.newSchool, a.gender), rb = rankOf(b.newSchool, b.gender);
           const aR = ra != null, bR = rb != null;
           if (aR && bR) return sortBy === "rankHigh" ? ra - rb : rb - ra;
           if (aR) return -1;
@@ -377,7 +385,7 @@
       } else if (sortBy === "singles") {
         // Best ITA singles ranking first (#1 first); players outside top 125 to the bottom (newest-first tiebreak).
         players.sort((a, b) => {
-          const ra = singlesRankOf(a.name), rb = singlesRankOf(b.name);
+          const ra = singlesRankOf(a.name, a.gender), rb = singlesRankOf(b.name, b.gender);
           const aR = ra != null, bR = rb != null;
           if (aR && bR) return ra - rb;
           if (aR) return -1;
@@ -402,10 +410,10 @@
       }
 
       grid.innerHTML = players.map(p => {
-        const newRank = rankOf(p.newSchool);
+        const newRank = rankOf(p.newSchool, p.gender);
         const newRankTag = (newRank != null) ? '<span class="rank">#' + newRank + '</span>' : '';
         // Previous-school rank — skip lookup for multi-school strings like "Arkansas, Charlotte".
-        const prevRank = p.previousSchool.includes(",") ? null : rankOf(p.previousSchool);
+        const prevRank = p.previousSchool.includes(",") ? null : rankOf(p.previousSchool, p.gender);
         const prevRankTag = (prevRank != null) ? '<span class="rank">#' + prevRank + '</span>' : '';
         const prev = esc(p.previousSchool) + prevRankTag;
         const schools = p.newSchool
@@ -413,8 +421,8 @@
           : prev;
         // Singles + Doubles rankings go inline next to the name (where class year used to be).
         // Class year is kept in the data but no longer shown on cards.
-        const singlesRank = singlesRankOf(p.name);
-        const doublesRank = doublesRankOf(p.name);
+        const singlesRank = singlesRankOf(p.name, p.gender);
+        const doublesRank = doublesRankOf(p.name, p.gender);
         let inlineRank = "";
         if (singlesRank != null) inlineRank += ' <span class="year" title="ITA Singles #' + singlesRank + ' as of 2026-05-20">&middot; Singles #' + singlesRank + '</span>';
         if (doublesRank != null) inlineRank += ' <span class="year" title="ITA Doubles #' + doublesRank + ' as of 2026-05-20">&middot; Doubles #' + doublesRank + '</span>';
