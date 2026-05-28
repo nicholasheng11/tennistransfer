@@ -402,18 +402,21 @@
         const schools = p.newSchool
           ? prev + '<span class="arrow">&rarr;</span>' + esc(p.newSchool) + newRankTag
           : prev;
-        const year = p.classYear ? ' <span class="year">&middot; ' + esc(p.classYear) + '</span>' : "";
-        // Bottom meta line: country / UTR / Singles rank (whichever present). Hidden entirely if all empty.
+        // Singles ranking goes inline next to the name (where class year used to be).
+        // Class year is kept in the data but no longer shown on cards.
+        const singlesRank = singlesRankOf(p.name);
+        const inlineRank = (singlesRank != null)
+          ? ' <span class="year" title="ITA Singles #' + singlesRank + ' as of 2026-05-20">&middot; Singles #' + singlesRank + '</span>'
+          : "";
+        // Bottom meta line: country and/or UTR. Hidden entirely if both empty.
         const metaParts = [];
         if (p.country) metaParts.push(esc(p.country));
         if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
-        const singlesRank = singlesRankOf(p.name);
-        if (singlesRank != null) metaParts.push('<span class="singles" title="ITA Singles #' + singlesRank + ' as of 2026-05-20">Singles #' + singlesRank + '</span>');
         const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
         return `
           <div class="card">
             <div class="card-top">
-              <div class="name">${esc(p.name)}${year}</div>
+              <div class="name">${esc(p.name)}${inlineRank}</div>
               <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
             </div>
             <div class="schools">${schools}</div>
