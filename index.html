@@ -136,6 +136,7 @@
     .meta { margin-top: 8px; font-size: 12px; color: #6b7280; }
     .updated { cursor: help; }
     .utr { font-weight: 600; cursor: help; }
+    .singles { font-weight: 600; cursor: help; }
     .utr-note { font-size: 0.75em; color: #9ca3af; font-weight: 400; }
 
     /* ---- Status badges (one color per status) ------------------------- */
@@ -178,6 +179,7 @@
           <option value="rankHigh">Highest ranked destination</option>
           <option value="rankLow">Lowest ranked destination</option>
           <option value="utr">Highest UTR</option>
+          <option value="singles">Highest singles ranking</option>
         </select>
       </div>
       <div class="sortwrap">
@@ -241,6 +243,13 @@
     // ITA team rankings (rankings.js). Schools not listed are unranked.
     const RANKINGS = (typeof ITA_RANKINGS_M !== "undefined" && ITA_RANKINGS_M) ? ITA_RANKINGS_M : {};
     const rankOf = school => (school && RANKINGS[school] != null) ? RANKINGS[school] : null;
+
+    // ITA singles rankings (singles-m.js). Players not in top 125 are unranked.
+    const SINGLES = (typeof ITA_SINGLES_M !== "undefined" && ITA_SINGLES_M) ? ITA_SINGLES_M : {};
+    const singlesRankOf = name => {
+      const key = (name || "").toLowerCase();
+      return (key && SINGLES[key] != null) ? SINGLES[key] : null;
+    };
 
     // Turn a status like "In Portal" into a CSS class like "inportal".
     function badgeClass(status) {
@@ -356,6 +365,16 @@
           if (bH) return 1;
           return b.dateUpdated.localeCompare(a.dateUpdated);
         });
+      } else if (sortBy === "singles") {
+        // Best ITA singles ranking first (#1 first); players outside top 125 to the bottom (newest-first tiebreak).
+        players.sort((a, b) => {
+          const ra = singlesRankOf(a.name), rb = singlesRankOf(b.name);
+          const aR = ra != null, bR = rb != null;
+          if (aR && bR) return ra - rb;
+          if (aR) return -1;
+          if (bR) return 1;
+          return b.dateUpdated.localeCompare(a.dateUpdated);
+        });
       } else if (sortBy === "newSchool") {
         players.sort((a, b) => (a.newSchool || "￿").localeCompare(b.newSchool || "￿"));
       } else if (sortBy === "prevSchool") {
@@ -384,10 +403,12 @@
           ? prev + '<span class="arrow">&rarr;</span>' + esc(p.newSchool) + newRankTag
           : prev;
         const year = p.classYear ? ' <span class="year">&middot; ' + esc(p.classYear) + '</span>' : "";
-        // Bottom meta line: country and/or UTR (whichever present). Hidden entirely if both empty.
+        // Bottom meta line: country / UTR / Singles rank (whichever present). Hidden entirely if all empty.
         const metaParts = [];
         if (p.country) metaParts.push(esc(p.country));
         if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
+        const singlesRank = singlesRankOf(p.name);
+        if (singlesRank != null) metaParts.push('<span class="singles" title="ITA Singles #' + singlesRank + ' as of 2026-05-20">Singles #' + singlesRank + ' <span class="utr-note">(at update)</span></span>');
         const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
         return `
           <div class="card">
