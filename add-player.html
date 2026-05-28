@@ -35,6 +35,24 @@
     textarea { min-height:120px; resize:vertical; line-height:1.4; }
     .hint { font-size:12px; color:var(--muted); margin-top:6px; }
 
+    /* Gender radio row — sits above the main input in each panel */
+    .gender-row {
+      display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 4px;
+    }
+    .gender-row > .gender-label {
+      flex:0 0 auto; align-self:center; font-size:13px; font-weight:600; margin:0 6px 0 0;
+    }
+    .gender-row label.opt {
+      flex:1 1 auto; display:flex; align-items:center; justify-content:center;
+      min-height:44px; padding:6px 12px; border:1px solid var(--border);
+      border-radius:9px; background:#fff; font-size:14px; font-weight:600;
+      color:#374151; cursor:pointer; margin:0;
+    }
+    .gender-row label.opt input { width:auto; min-height:0; margin-right:6px; }
+    .gender-row label.opt:has(input:checked) {
+      background:var(--navy); color:#fff; border-color:var(--navy);
+    }
+
     button.action {
       margin-top:18px; width:100%; min-height:50px; background:var(--accent); color:#fff;
       border:none; padding:14px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer;
@@ -80,6 +98,11 @@
 
     <!-- SINGLE -->
     <div class="panel active" id="panel-single">
+      <div class="gender-row" role="radiogroup" aria-label="Gender">
+        <span class="gender-label">Gender</span>
+        <label class="opt"><input type="radio" name="s-gender" value="M" checked> Men's</label>
+        <label class="opt"><input type="radio" name="s-gender" value="W"> Women's</label>
+      </div>
       <label>Player name</label>
       <input id="s-name" placeholder="e.g. Carlos Méndez" />
       <label>Status</label>
@@ -101,6 +124,11 @@
 
     <!-- SMART PASTE -->
     <div class="panel" id="panel-paste">
+      <div class="gender-row" role="radiogroup" aria-label="Gender">
+        <span class="gender-label">Gender</span>
+        <label class="opt"><input type="radio" name="p-gender" value="M" checked> Men's</label>
+        <label class="opt"><input type="radio" name="p-gender" value="W"> Women's</label>
+      </div>
       <label>Paste one X / Twitter post</label>
       <textarea id="p-input" placeholder="e.g. BREAKING: Carlos Méndez has entered the transfer portal from Florida. The Jr. ..."></textarea>
       <button class="action secondary" id="p-parse">Parse</button>
@@ -129,11 +157,16 @@
 
     <!-- BULK -->
     <div class="panel" id="panel-bulk">
-      <label>One player per line — <code>Name, previousSchool, newSchool, status, classYear, utr, country</code></label>
+      <div class="gender-row" role="radiogroup" aria-label="Default gender">
+        <span class="gender-label">Default gender</span>
+        <label class="opt"><input type="radio" name="b-gender" value="M" checked> Men's</label>
+        <label class="opt"><input type="radio" name="b-gender" value="W"> Women's</label>
+      </div>
+      <label>One player per line — <code>Name, previousSchool, newSchool, status, classYear, utr, country, gender</code></label>
       <textarea id="b-input" placeholder="Carlos Méndez, Florida, Auburn, C, Jr.
 Jonas Weber, Ohio State, , P, So.
 Diego Costa, Texas, TCU, S, Gr."></textarea>
-      <div class="hint">Status shortcuts: P/portal, C/committed (S/signed also maps to Committed). New school, UTR, and country may be blank. IDs auto-number from your highest existing ID.</div>
+      <div class="hint">Status shortcuts: P/portal, C/committed (S/signed also maps to Committed). New school, UTR, country, and gender may be blank. Gender column accepts M/W/Men/Women/Mens/Womens/Male/Female (case-insensitive); blank uses the default above. IDs auto-number from your highest existing ID.</div>
       <button class="action" id="b-gen">Generate entries</button>
     </div>
 
@@ -169,6 +202,7 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
     // Build one transfers.js line. JSON.stringify on each value = safe, valid, escaped.
     function buildEntry(o) {
       return "  { id: " + JSON.stringify(String(o.id)) +
+        ", gender: " + JSON.stringify(o.gender || "M") +
         ", name: " + JSON.stringify(o.name || "") +
         ", status: " + JSON.stringify(o.status || "") +
         ", previousSchool: " + JSON.stringify(o.previousSchool || "") +
@@ -220,7 +254,8 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       const name = $("s-name").value.trim();
       if (!name) { alert("Please enter a player name."); return; }
       setOutput(buildEntry({
-        id: Date.now(), name: name, status: $("s-status").value,
+        id: Date.now(), gender: genderOf("s-gender"),
+        name: name, status: $("s-status").value,
         previousSchool: $("s-prev").value.trim(), newSchool: $("s-new").value.trim(),
         country: $("s-country").value.trim(), utr: $("s-utr").value.trim(), classYear: $("s-year").value.trim(),
         dateUpdated: todayISO()
@@ -337,9 +372,10 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       const status = $("p-status").value;
       const existing = findExisting(name);
       if (existing && status === "Committed") {
-        // UPDATE: keep existing id/previousSchool/classYear/country; apply new status + newSchool; today's date
+        // UPDATE: keep existing id/gender/previousSchool/classYear/country; apply new status + newSchool; today's date
         setOutput(buildEntry({
-          id: existing.id, name: existing.name, status: status,
+          id: existing.id, gender: existing.gender || genderOf("p-gender"),
+          name: existing.name, status: status,
           previousSchool: existing.previousSchool,
           newSchool: $("p-new").value.trim() || existing.newSchool,
           country: existing.country || $("p-country").value.trim(),
@@ -350,13 +386,29 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
           JSON.stringify(String(existing.id)) + ").");
       } else {
         setOutput(buildEntry({
-          id: Date.now(), name: name, status: status,
+          id: Date.now(), gender: genderOf("p-gender"),
+          name: name, status: status,
           previousSchool: $("p-prev").value.trim(), newSchool: $("p-new").value.trim(),
           country: $("p-country").value.trim(), utr: $("p-utr").value.trim(), classYear: $("p-year").value.trim(),
           dateUpdated: todayISO()
         }), "+ New entry — add this line to transfers.js.");
       }
     };
+
+    // ---- Gender helpers ----------------------------------------------
+    // Read which radio is checked in a named group (s-gender / p-gender / b-gender).
+    function genderOf(name) {
+      const el = document.querySelector('input[name="' + name + '"]:checked');
+      return el ? el.value : "M";
+    }
+    // Normalize a free-text gender token from the bulk CSV. Blank -> fallback.
+    function genderNorm(s, fallback) {
+      const x = (s || "").trim().toLowerCase();
+      if (!x) return fallback;
+      if (x === "m" || x === "men" || x === "mens" || x === "men's" || x === "male") return "M";
+      if (x === "w" || x === "women" || x === "womens" || x === "women's" || x === "female" || x === "f") return "W";
+      return fallback;
+    }
 
     // ---- BULK ---------------------------------------------------------
     function normStatus(s) {
@@ -371,6 +423,7 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       if (!lines.length) { alert("Paste at least one line."); return; }
       const startId = maxId() + 1;
       let nextId = startId;
+      const defaultGender = genderOf("b-gender");
       const out = [];
       const errs = [];
       lines.forEach((line, i) => {
@@ -378,7 +431,8 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
         const name = parts[0] || "";
         if (!name) { errs.push("line " + (i + 1) + " (no name)"); return; }
         out.push(buildEntry({
-          id: nextId++, name: name,
+          id: nextId++, gender: genderNorm(parts[7] || "", defaultGender),
+          name: name,
           previousSchool: parts[1] || "", newSchool: parts[2] || "",
           status: normStatus(parts[3] || ""), classYear: parts[4] || "",
           country: parts[6] || "", utr: parts[5] || "", dateUpdated: todayISO()
