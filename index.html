@@ -179,7 +179,7 @@
           <option value="rankHigh">Highest ranked destination</option>
           <option value="rankLow">Lowest ranked destination</option>
           <option value="utr">Highest UTR</option>
-          <option value="singles">Highest singles ranking</option>
+          <option value="singles">ITA High</option>
         </select>
       </div>
       <div class="sortwrap">
@@ -408,7 +408,7 @@
         if (p.country) metaParts.push(esc(p.country));
         if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
         const singlesRank = singlesRankOf(p.name);
-        if (singlesRank != null) metaParts.push('<span class="singles" title="ITA Singles #' + singlesRank + ' as of 2026-05-20">Singles #' + singlesRank + ' <span class="utr-note">(at update)</span></span>');
+        if (singlesRank != null) metaParts.push('<span class="singles" title="ITA Singles #' + singlesRank + ' as of 2026-05-20">Singles #' + singlesRank + '</span>');
         const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
         return `
           <div class="card">
