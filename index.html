@@ -242,12 +242,23 @@
       // ACC
       "Boston College","California","Cal","Clemson","Duke","Florida State","Georgia Tech","Louisville","Miami","Miami (FL)","NC State","North Carolina","UNC","Notre Dame","Pitt","Pittsburgh","SMU","Stanford","Syracuse","Virginia","Virginia Tech","Wake Forest"
     ]);
-    const isP4 = school => POWER4.has(school);
+    // Some players have a comma-separated `previousSchool` listing multiple stops
+    // (e.g. "UCF, Oklahoma State"). For P4 / Mid-Major classification, what matters is
+    // the LAST one — the school they're actually transferring FROM right now.
+    const mostRecentSchool = s => {
+      if (!s) return "";
+      const i = s.lastIndexOf(",");
+      return (i === -1 ? s : s.slice(i + 1)).trim();
+    };
+    const isP4 = school => POWER4.has(mostRecentSchool(school));
 
     // Known non-D1 (D2 / JUCO / NAIA) schools that appear in the data — excluded from "Mid-Major"
     // (which means a Division I program that isn't Power 4). Add to this list if a non-D1 school shows up.
-    const NON_D1 = new Set(["UIndy","Midwestern State","West Alabama","Saint Leo","Collin College","Middle Georgia State","Mississippi College"]);
-    const isMidMajor = school => !!school && !isP4(school) && !NON_D1.has(school);
+    const NON_D1 = new Set(["UIndy","Midwestern State","West Alabama","Saint Leo","Collin College","Middle Georgia State","Mississippi College","Le Moyne","Rollins College","Valdosta State"]);
+    const isMidMajor = school => {
+      const s = mostRecentSchool(school);
+      return !!s && !POWER4.has(s) && !NON_D1.has(s);
+    };
 
     // ITA team rankings (M + W). Lookup picks the right table by player gender; missing gender falls back to M.
     const RANKINGS_M = (typeof ITA_RANKINGS_M !== "undefined" && ITA_RANKINGS_M) ? ITA_RANKINGS_M : {};
