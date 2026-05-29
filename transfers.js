@@ -13,8 +13,10 @@
 
 const TRANSFERS = [
   { id: "272", gender: "M", name: "Niccolò Baroni", status: "Committed", previousSchool: "Mississippi State", newSchool: "Ole Miss", country: "Italy", utr: "13.40", classYear: "", dateUpdated: "2026-05-28" },
-  { id: "173", gender: "M", name: "Ethan Dasset", status: "In Portal", previousSchool: "Texas A&M Corpus Christi", newSchool: "", country: "Belgium", utr: "12.12", classYear: "", dateUpdated: "2026-05-04" },
+  { id: "212", gender: "W", name: "Rio Maeda", status: "Committed", previousSchool: "South Alabama", newSchool: "West Virginia", country: "Japan", utr: "9.64", classYear: "So.", dateUpdated: "2026-05-28" },
+  { id: "46", gender: "M", name: "Loan Lestir", status: "Committed", previousSchool: "Ole Miss", newSchool: "Memphis", hometown: "Lille, France", country: "France", utr: "12.83", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "172", gender: "M", name: "Dmitri Goubin", status: "Committed", previousSchool: "Utah State", newSchool: "UTSA", country: "Texas", utr: "12.03", classYear: "So.", dateUpdated: "2026-05-28" },
+  { id: "173", gender: "M", name: "Ethan Dasset", status: "In Portal", previousSchool: "Texas A&M Corpus Christi", newSchool: "", country: "Belgium", utr: "12.12", classYear: "", dateUpdated: "2026-05-04" },
   { id: "171", gender: "M", name: "Matteo Ceradelli", status: "In Portal", previousSchool: "Youngstown State", newSchool: "", country: "Italy", utr: "11.70", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "170", gender: "M", name: "Jacob Rouleau-Mailly", status: "In Portal", previousSchool: "New Orleans", newSchool: "", country: "Canada", utr: "11.75", classYear: "", dateUpdated: "2026-05-04" },
   { id: "169", gender: "M", name: "David Petrovic", status: "In Portal", previousSchool: "St. John's", newSchool: "", country: "Germany", utr: "12.05", classYear: "Fr.", dateUpdated: "2026-05-04" },
@@ -136,7 +138,6 @@ const TRANSFERS = [
   { id: "43", gender: "M", name: "Noa Tcherniack", status: "Committed", previousSchool: "Northern Arizona", newSchool: "Michigan State", hometown: "Perols, France", country: "France", utr: "12.72", classYear: "R-Fr.", dateUpdated: "2026-05-27" },
   { id: "44", gender: "M", name: "Francisco Landeras", status: "In Portal", previousSchool: "Drake", newSchool: "", hometown: "Overland Park, Kansas", country: "Kansas", utr: "10.43", classYear: "Fr.", dateUpdated: "2026-05-27" },
   { id: "45", gender: "M", name: "James Lorenzetti", status: "In Portal", previousSchool: "Stetson", newSchool: "", hometown: "Milford, Connecticut", country: "Connecticut", utr: "11.87", classYear: "So.", dateUpdated: "2026-05-27" },
-  { id: "46", gender: "M", name: "Loan Lestir", status: "Committed", previousSchool: "Ole Miss", newSchool: "Memphis", hometown: "Lille, France", country: "France", utr: "12.83", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "47", gender: "M", name: "Egor Gorin", status: "In Portal", previousSchool: "Texas A&M", newSchool: "", hometown: "Moscow, Russia", country: "Russia", utr: "11.80", classYear: "Fr.", dateUpdated: "2026-05-27" },
   { id: "48", gender: "M", name: "Majdi Ben Abdelwahed", status: "In Portal", previousSchool: "Morgan State", newSchool: "", hometown: "Kelibia, Tunisia", country: "Tunisia", utr: "10.99", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "49", gender: "M", name: "Gabriel Garay", status: "Committed", previousSchool: "West Alabama", newSchool: "Troy", hometown: "", country: "Brazil", utr: "12.58", classYear: "", dateUpdated: "2026-05-27" },
@@ -255,7 +256,6 @@ const TRANSFERS = [
   { id: "215", gender: "W", name: "Emma Roberts", status: "In Portal", previousSchool: "North Dakota", newSchool: "", country: "New Zealand", utr: "", classYear: "Fr.", dateUpdated: "2026-05-01" },
   { id: "214", gender: "W", name: "Ashikha Amalnathan", status: "In Portal", previousSchool: "South Carolina State", newSchool: "", country: "Indiana", utr: "", classYear: "So.", dateUpdated: "2026-05-01" },
   { id: "213", gender: "W", name: "Beatrice Stagno", status: "In Portal", previousSchool: "Ole Miss", newSchool: "", country: "Italy", utr: "9.81", classYear: "Fr.", dateUpdated: "2026-05-01" },
-  { id: "212", gender: "W", name: "Rio Maeda", status: "Committed", previousSchool: "South Alabama", newSchool: "West Virginia", country: "Japan", utr: "9.64", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "211", gender: "W", name: "Che Nel", status: "In Portal", previousSchool: "Kennesaw State", newSchool: "", country: "South Africa", utr: "", classYear: "So.", dateUpdated: "2026-05-01" },
   { id: "210", gender: "W", name: "Miranda Noor", status: "In Portal", previousSchool: "Oral Roberts", newSchool: "", country: "Venezuela", utr: "", classYear: "", dateUpdated: "2026-05-01" },
   { id: "209", gender: "W", name: "Sofia Mavor", status: "In Portal", previousSchool: "Air Force", newSchool: "", country: "Maine", utr: "8.81", classYear: "", dateUpdated: "2026-05-01" },
