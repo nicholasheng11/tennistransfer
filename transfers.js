@@ -16,6 +16,7 @@ const TRANSFERS = [
   { id: "212", gender: "W", name: "Rio Maeda", status: "Committed", previousSchool: "South Alabama", newSchool: "West Virginia", country: "Japan", utr: "9.64", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "46", gender: "M", name: "Loan Lestir", status: "Committed", previousSchool: "Ole Miss", newSchool: "Memphis", hometown: "Lille, France", country: "France", utr: "12.83", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "172", gender: "M", name: "Dmitri Goubin", status: "Committed", previousSchool: "Utah State", newSchool: "UTSA", country: "Texas", utr: "12.03", classYear: "So.", dateUpdated: "2026-05-28" },
+  { id: "273", gender: "M", name: "Jacob Maravillas", status: "In Portal", previousSchool: "Le Moyne, Hofstra", newSchool: "", country: "New Jersey", utr: "10.63", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "173", gender: "M", name: "Ethan Dasset", status: "In Portal", previousSchool: "Texas A&M Corpus Christi", newSchool: "", country: "Belgium", utr: "12.12", classYear: "", dateUpdated: "2026-05-04" },
   { id: "171", gender: "M", name: "Matteo Ceradelli", status: "In Portal", previousSchool: "Youngstown State", newSchool: "", country: "Italy", utr: "11.70", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "170", gender: "M", name: "Jacob Rouleau-Mailly", status: "In Portal", previousSchool: "New Orleans", newSchool: "", country: "Canada", utr: "11.75", classYear: "", dateUpdated: "2026-05-04" },
