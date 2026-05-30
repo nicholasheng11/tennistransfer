@@ -12,6 +12,8 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "104", gender: "M", name: "Moritz Kudernatsch", status: "Committed", previousSchool: "Memphis", newSchool: "Ole Miss", country: "Germany", utr: "13.12", classYear: "", dateUpdated: "2026-05-28" },
+  { id: "276", gender: "M", name: "Stefan Vedovelli", status: "Committed", previousSchool: "Belmont", newSchool: "Ole Miss", country: "Italy", utr: "12.36", classYear: "", dateUpdated: "2026-05-28" },
   { id: "275", gender: "W", name: "Emma Kamper", status: "Committed", previousSchool: "Utah", newSchool: "Auburn", country: "Denmark", utr: "10.71", classYear: "Sr.", dateUpdated: "2026-05-28" },
   { id: "274", gender: "W", name: "Anna Perelman", status: "Committed", previousSchool: "Texas A&M", newSchool: "Miami (FL)", country: "Russia", utr: "10.19", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "272", gender: "M", name: "Niccolo Baroni", status: "Committed", previousSchool: "Mississippi State", newSchool: "Ole Miss", country: "Italy", utr: "13.40", classYear: "", dateUpdated: "2026-05-28" },
@@ -86,7 +88,6 @@ const TRANSFERS = [
   { id: "107", gender: "M", name: "Aryan Jit Singh", status: "In Portal", previousSchool: "Georgia State", newSchool: "", country: "England", utr: "11.49", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "106", gender: "M", name: "Luis Carvalho", status: "In Portal", previousSchool: "Memphis", newSchool: "", country: "Brazil", utr: "12.20", classYear: "", dateUpdated: "2026-05-04" },
   { id: "105", gender: "M", name: "Saúl Berdullas", status: "In Portal", previousSchool: "UT Arlington", newSchool: "", country: "Spain", utr: "12.08", classYear: "", dateUpdated: "2026-05-04" },
-  { id: "104", gender: "M", name: "Moritz Kudernatsch", status: "In Portal", previousSchool: "Memphis", newSchool: "", country: "Germany", utr: "13.12", classYear: "", dateUpdated: "2026-05-04" },
   { id: "103", gender: "M", name: "Enrique Lana", status: "In Portal", previousSchool: "Duquesne", newSchool: "", country: "Spain", utr: "11.82", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "102", gender: "M", name: "Massimo Pizzigoni", status: "In Portal", previousSchool: "Charlotte", newSchool: "", country: "Italy", utr: "12.43", classYear: "Fr.", dateUpdated: "2026-05-04" },
   { id: "101", gender: "M", name: "Hoan Mouret", status: "In Portal", previousSchool: "UAB", newSchool: "", country: "France", utr: "11.85", classYear: "So.", dateUpdated: "2026-05-04" },
