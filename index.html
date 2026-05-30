@@ -45,6 +45,11 @@
     header h1 { font-size: 19px; font-weight: 700; }
     header p  { font-size: 13px; opacity: 0.75; margin-top: 2px; }
     header p.disclaimer { font-size: 11px; margin-top: 3px; line-height: 1.35; }
+    /* Contact line — sits below the disclaimer. opacity:1 so the link can be a brighter
+       sky-blue (#93c5fd) against the navy header, while the lead-in text stays muted. */
+    header p.contact { font-size: 11px; margin-top: 5px; line-height: 1.35; opacity: 1; color: rgba(255,255,255,0.75); }
+    header p.contact a { color: #93c5fd; text-decoration: none; white-space: nowrap; }
+    header p.contact a:hover { text-decoration: underline; }
 
     .search {
       margin-top: 12px;
@@ -169,6 +174,7 @@
     <h1>🎾 D1 Tennis Transfer Tracker</h1>
     <p id="subtitle"></p>
     <p class="disclaimer">UTRs reflect each player's rating at the time their card was last updated, not live ratings. ITA doubles rankings reflect each player's team at their previous school.</p>
+    <p class="contact">For updates, submissions, or fixes, email <a href="mailto:support@tennistransferportal.com">support@tennistransferportal.com</a></p>
     <input id="search" class="search" type="text" placeholder="Search player or school..." />
     <div id="gender-filters" class="filters"></div>
     <div class="controls">
