@@ -12,6 +12,7 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "50", gender: "M", name: "Jose Murariu", status: "Committed", previousSchool: "Lehigh, Southern Miss", newSchool: "USF", hometown: "Parrish, Florida", country: "Florida", utr: "12.30", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "104", gender: "M", name: "Moritz Kudernatsch", status: "Committed", previousSchool: "Memphis", newSchool: "Ole Miss", country: "Germany", utr: "13.12", classYear: "", dateUpdated: "2026-05-28" },
   { id: "276", gender: "M", name: "Stefan Vedovelli", status: "Committed", previousSchool: "Belmont", newSchool: "Ole Miss", country: "Italy", utr: "12.36", classYear: "", dateUpdated: "2026-05-28" },
   { id: "275", gender: "W", name: "Emma Kamper", status: "Committed", previousSchool: "Utah", newSchool: "Auburn", country: "Denmark", utr: "10.71", classYear: "Sr.", dateUpdated: "2026-05-28" },
@@ -145,7 +146,6 @@ const TRANSFERS = [
   { id: "47", gender: "M", name: "Egor Gorin", status: "In Portal", previousSchool: "Texas A&M", newSchool: "", hometown: "Moscow, Russia", country: "Russia", utr: "11.80", classYear: "Fr.", dateUpdated: "2026-05-27" },
   { id: "48", gender: "M", name: "Majdi Ben Abdelwahed", status: "In Portal", previousSchool: "Morgan State", newSchool: "", hometown: "Kelibia, Tunisia", country: "Tunisia", utr: "10.99", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "49", gender: "M", name: "Gabriel Garay", status: "Committed", previousSchool: "West Alabama", newSchool: "Troy", hometown: "", country: "Brazil", utr: "12.58", classYear: "", dateUpdated: "2026-05-27" },
-  { id: "50", gender: "M", name: "Jose Murariu", status: "In Portal", previousSchool: "Southern Miss", newSchool: "", hometown: "Parrish, Florida", country: "Florida", utr: "12.25", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "51", gender: "M", name: "Joao Barreto", status: "In Portal", previousSchool: "Eastern Kentucky", newSchool: "", hometown: "Portugal", country: "Portugal", utr: "11.77", classYear: "Fr.", dateUpdated: "2026-05-27" },
   { id: "52", gender: "M", name: "Ilie Cazac", status: "In Portal", previousSchool: "Eastern Kentucky", newSchool: "", hometown: "Chișinău, Moldova", country: "Moldova", utr: "11.85", classYear: "Fr.", dateUpdated: "2026-05-27" },
   { id: "53", gender: "M", name: "Connor Dils", status: "In Portal", previousSchool: "New Mexico", newSchool: "", hometown: "Albuquerque, New Mexico", country: "New Mexico", utr: "11.17", classYear: "R-Fr.", dateUpdated: "2026-05-27" },
