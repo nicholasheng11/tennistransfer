@@ -12,10 +12,11 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "281", gender: "M", name: "Alessio Vasquez", status: "In Portal", previousSchool: "LSU", newSchool: "", country: "Germany", utr: "13.05", classYear: "Gr.", dateUpdated: "2026-05-28" },
   { id: "280", gender: "W", name: "Jana Hossam Salah", status: "Committed", previousSchool: "USC", newSchool: "Florida", country: "Egypt", utr: "10.53", classYear: "Jr.", dateUpdated: "2026-05-28" },
   { id: "279", gender: "W", name: "Margot Phanthala", status: "Committed", previousSchool: "Northwestern", newSchool: "Columbia", country: "France", utr: "9.96", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "16", gender: "M", name: "Dragos Nicolae Cazacu", status: "Committed", previousSchool: "Tennessee", newSchool: "Oklahoma", hometown: "Romania", country: "Romania", utr: "13.32", classYear: "Fr.", dateUpdated: "2026-05-28" },
-  { id: "278", gender: "W", name: "Veronika Kliuch", status: "Committed", previousSchool: "UNLV", newSchool: "Oklahoma State", country: "Ukraine", utr: "", classYear: "Jr.", dateUpdated: "2026-05-28" },
+  { id: "278", gender: "W", name: "Veronika Kliuch", status: "Committed", previousSchool: "UNLV", newSchool: "Oklahoma State", country: "Ukraine", utr: "10.14", classYear: "Jr.", dateUpdated: "2026-05-28" },
   { id: "277", gender: "W", name: "Eugenia Zozaya Menendez", status: "Committed", previousSchool: "USC", newSchool: "Virginia", country: "Spain", utr: "10.74", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "50", gender: "M", name: "Jose Murariu", status: "Committed", previousSchool: "Lehigh, Southern Miss", newSchool: "USF", hometown: "Parrish, Florida", country: "Florida", utr: "12.30", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "104", gender: "M", name: "Moritz Kudernatsch", status: "Committed", previousSchool: "Memphis", newSchool: "Ole Miss", country: "Germany", utr: "13.12", classYear: "", dateUpdated: "2026-05-28" },
