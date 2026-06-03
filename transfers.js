@@ -12,6 +12,9 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "235", gender: "W", name: "Kamea Medora", status: "Committed", previousSchool: "Louisiana-Lafayette, Utah", newSchool: "Minnesota", country: "Hawaii", utr: "", classYear: "Jr.", dateUpdated: "2026-05-28" },
+  { id: "282", gender: "M", name: "Bor Artnak", status: "Committed", previousSchool: "Arizona State", newSchool: "Texas A&M", country: "Slovenia", utr: "13.87", classYear: "Sr.", dateUpdated: "2026-05-28" },
+  { id: "283", gender: "M", name: "Ilia Snitari", status: "Committed", previousSchool: "UNLV", newSchool: "Texas A&M", country: "Moldova", utr: "13.63", classYear: "Jr.", dateUpdated: "2026-05-28" },
   { id: "281", gender: "M", name: "Alessio Vasquez", status: "In Portal", previousSchool: "LSU", newSchool: "", country: "Germany", utr: "13.05", classYear: "Gr.", dateUpdated: "2026-05-28" },
   { id: "280", gender: "W", name: "Jana Hossam Salah", status: "Committed", previousSchool: "USC", newSchool: "Florida", country: "Egypt", utr: "10.53", classYear: "Jr.", dateUpdated: "2026-05-28" },
   { id: "279", gender: "W", name: "Margot Phanthala", status: "Committed", previousSchool: "Northwestern", newSchool: "Columbia", country: "France", utr: "9.96", classYear: "So.", dateUpdated: "2026-05-28" },
@@ -242,7 +245,6 @@ const TRANSFERS = [
   { id: "238", gender: "W", name: "Neha Guru", status: "In Portal", previousSchool: "Toledo", newSchool: "", country: "Texas", utr: "8.80", classYear: "So.", dateUpdated: "2026-05-05" },
   { id: "237", gender: "W", name: "Olivia Manson", status: "In Portal", previousSchool: "Army", newSchool: "", country: "Illinois", utr: "", classYear: "So.", dateUpdated: "2026-05-05" },
   { id: "236", gender: "W", name: "Mariia Bakhtina", status: "In Portal", previousSchool: "UTRGV", newSchool: "", country: "Russia", utr: "", classYear: "", dateUpdated: "2026-05-04" },
-  { id: "235", gender: "W", name: "Kamea Medora", status: "In Portal", previousSchool: "Utah", newSchool: "", country: "Hawaii", utr: "", classYear: "Jr.", dateUpdated: "2026-05-04" },
   { id: "234", gender: "W", name: "Sophia Pacheco", status: "In Portal", previousSchool: "Lafayette College", newSchool: "", country: "Florida", utr: "", classYear: "", dateUpdated: "2026-05-04" },
   { id: "233", gender: "W", name: "Damla Arslan", status: "In Portal", previousSchool: "Morgan State", newSchool: "", country: "Turkey", utr: "", classYear: "Fr.", dateUpdated: "2026-05-04" },
   { id: "232", gender: "W", name: "Ceylin Ipek", status: "In Portal", previousSchool: "Eastern Kentucky", newSchool: "", country: "Turkey", utr: "", classYear: "So.", dateUpdated: "2026-05-04" },
