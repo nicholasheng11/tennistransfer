@@ -12,6 +12,8 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "255", gender: "W", name: "Roisin Gilheany", status: "Committed", previousSchool: "Oklahoma", newSchool: "NC State", country: "Australia", utr: "9.69", classYear: "Jr.", dateUpdated: "2026-05-28" },
+  { id: "284", gender: "W", name: "Ioana Sava", status: "Committed", previousSchool: "LSU", newSchool: "FAU", country: "Romania", utr: "9.68", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "235", gender: "W", name: "Kamea Medora", status: "Committed", previousSchool: "Louisiana-Lafayette, Utah", newSchool: "Minnesota", country: "Hawaii", utr: "8.67", classYear: "Jr.", dateUpdated: "2026-05-28" },
   { id: "282", gender: "M", name: "Bor Artnak", status: "Committed", previousSchool: "Arizona State", newSchool: "Texas A&M", country: "Slovenia", utr: "13.87", classYear: "Sr.", dateUpdated: "2026-05-28" },
   { id: "283", gender: "M", name: "Ilia Snitari", status: "Committed", previousSchool: "UNLV", newSchool: "Texas A&M", country: "Moldova", utr: "13.63", classYear: "Jr.", dateUpdated: "2026-05-28" },
@@ -225,7 +227,6 @@ const TRANSFERS = [
   { id: "258", gender: "W", name: "Zoie Epps", status: "Committed", previousSchool: "Louisiana Tech", newSchool: "Clemson", country: "", utr: "10.38", classYear: "", dateUpdated: "2026-05-18" },
   { id: "257", gender: "W", name: "Lauren Seye", status: "Committed", previousSchool: "UCF", newSchool: "Mississippi State", country: "Belgium", utr: "9.86", classYear: "", dateUpdated: "2026-05-18" },
   { id: "256", gender: "W", name: "Kira Matushkina", status: "Committed", previousSchool: "Old Dominion", newSchool: "TCU", country: "Russia", utr: "10.36", classYear: "", dateUpdated: "2026-05-15" },
-  { id: "255", gender: "W", name: "Roisin Gilheany", status: "In Portal", previousSchool: "Oklahoma", newSchool: "", country: "Australia", utr: "", classYear: "", dateUpdated: "2026-05-14" },
   { id: "254", gender: "W", name: "Sofiia Mykhailets", status: "Committed", previousSchool: "Memphis", newSchool: "TCU", country: "Ukraine", utr: "10.34", classYear: "", dateUpdated: "2026-05-13" },
   { id: "253", gender: "W", name: "Nikita Liyanage", status: "In Portal", previousSchool: "Chicago State", newSchool: "", country: "Australia", utr: "", classYear: "So.", dateUpdated: "2026-05-12" },
   { id: "252", gender: "W", name: "Lara Quaglia", status: "In Portal", previousSchool: "Mizzou", newSchool: "", country: "Argentina", utr: "", classYear: "Fr.", dateUpdated: "2026-05-12" },
