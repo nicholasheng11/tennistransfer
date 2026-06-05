@@ -12,6 +12,9 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "287", gender: "M", name: "Imran Daniel Hazli", status: "Committed", previousSchool: "Baylor, San Diego State", newSchool: "Texas Tech", country: "Malaysia", utr: "12.71", classYear: "So.", dateUpdated: "2026-05-28" },
+  { id: "288", gender: "M", name: "JP Day", status: "Committed", previousSchool: "Ohio State", newSchool: "UC Santa Barbara", country: "California", utr: "12.77", classYear: "Jr.", dateUpdated: "2026-05-28" },
+  { id: "137", gender: "M", name: "Gevorg Mnatsakanyan", status: "Committed", previousSchool: "VCU", newSchool: "Virginia Tech", country: "Maryland", utr: "12.21", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "158", gender: "M", name: "Denis Maijorov", status: "Committed", previousSchool: "San Diego State", newSchool: "Loyola Marymount", country: "Estonia", utr: "11.81", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "125", gender: "M", name: "Seb Griffiths", status: "Committed", previousSchool: "Alcorn State", newSchool: "Alabama A&M", country: "Wales", utr: "10.84", classYear: "Fr.", dateUpdated: "2026-05-28" },
   { id: "206", gender: "W", name: "Elen Jantacova", status: "Committed", previousSchool: "NAU", newSchool: "Long Beach State", country: "Czech Republic", utr: "9.02", classYear: "So.", dateUpdated: "2026-05-28" },
@@ -71,7 +74,6 @@ const TRANSFERS = [
   { id: "140", gender: "M", name: "Kostiantyn Mantach", status: "In Portal", previousSchool: "VCU", newSchool: "", country: "Ukraine", utr: "11.60", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "139", gender: "M", name: "Jonas Keck", status: "In Portal", previousSchool: "Western Michigan", newSchool: "", country: "Germany", utr: "11.39", classYear: "Fr.", dateUpdated: "2026-05-04" },
   { id: "138", gender: "M", name: "Hugo Car", status: "In Portal", previousSchool: "USF", newSchool: "", country: "France", utr: "13.40", classYear: "Gr.", dateUpdated: "2026-05-04" },
-  { id: "137", gender: "M", name: "Gevorg Mnatsakanyan", status: "In Portal", previousSchool: "VCU", newSchool: "", country: "Maryland", utr: "12.20", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "136", gender: "M", name: "Max Relic", status: "In Portal", previousSchool: "Utah", newSchool: "", country: "England", utr: "12.69", classYear: "", dateUpdated: "2026-05-04" },
   { id: "135", gender: "M", name: "Holland Snell", status: "In Portal", previousSchool: "New Mexico State", newSchool: "", country: "Texas", utr: "12.10", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "134", gender: "M", name: "Mario Beckles", status: "In Portal", previousSchool: "Saint Francis (PA)", newSchool: "", country: "New Jersey", utr: "10.52", classYear: "Fr.", dateUpdated: "2026-05-04" },
