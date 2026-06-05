@@ -12,6 +12,10 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "158", gender: "M", name: "Denis Maijorov", status: "Committed", previousSchool: "San Diego State", newSchool: "Loyola Marymount", country: "Estonia", utr: "11.81", classYear: "So.", dateUpdated: "2026-05-28" },
+  { id: "125", gender: "M", name: "Seb Griffiths", status: "Committed", previousSchool: "Alcorn State", newSchool: "Alabama A&M", country: "Wales", utr: "10.84", classYear: "Fr.", dateUpdated: "2026-05-28" },
+  { id: "206", gender: "W", name: "Elen Jantacova", status: "Committed", previousSchool: "NAU", newSchool: "Long Beach State", country: "Czech Republic", utr: "9.02", classYear: "So.", dateUpdated: "2026-05-28" },
+  { id: "286", gender: "M", name: "Caleb Tobler", status: "Committed", previousSchool: "Hawaii Pacific", newSchool: "Hofstra", country: "Canada", utr: "9.94", classYear: "Fr.", dateUpdated: "2026-05-28" },
   { id: "285", gender: "M", name: "Gabriel Debru", status: "Committed", previousSchool: "Illinois", newSchool: "Texas", country: "France", utr: "13.68", classYear: "", dateUpdated: "2026-05-28" },
   { id: "255", gender: "W", name: "Roisin Gilheany", status: "Committed", previousSchool: "Oklahoma", newSchool: "NC State", country: "Australia", utr: "9.69", classYear: "Jr.", dateUpdated: "2026-05-28" },
   { id: "284", gender: "W", name: "Ioana Sava", status: "Committed", previousSchool: "LSU", newSchool: "FAU", country: "Romania", utr: "9.68", classYear: "So.", dateUpdated: "2026-05-28" },
@@ -48,7 +52,6 @@ const TRANSFERS = [
   { id: "161", gender: "M", name: "Lukas Velik", status: "In Portal", previousSchool: "Boise State", newSchool: "", country: "Czech Republic", utr: "12.51", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "160", gender: "M", name: "Walker Valentine", status: "In Portal", previousSchool: "North Dakota", newSchool: "", country: "Australia", utr: "11.07", classYear: "", dateUpdated: "2026-05-04" },
   { id: "159", gender: "M", name: "Felipe Spagnuolo", status: "In Portal", previousSchool: "Nicholls State", newSchool: "", country: "Argentina", utr: "11.39", classYear: "So.", dateUpdated: "2026-05-04" },
-  { id: "158", gender: "M", name: "Denis Maijorov", status: "In Portal", previousSchool: "San Diego State", newSchool: "", country: "Estonia", utr: "11.82", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "157", gender: "M", name: "Adrien Ducruet", status: "In Portal", previousSchool: "Saint Louis", newSchool: "", country: "France", utr: "11.17", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "156", gender: "M", name: "Braden Hannig", status: "In Portal", previousSchool: "South Alabama", newSchool: "", country: "Alabama", utr: "12.54", classYear: "", dateUpdated: "2026-05-04" },
   { id: "155", gender: "M", name: "Kotaro Matsumura", status: "In Portal", previousSchool: "North Dakota", newSchool: "", country: "Japan", utr: "11.70", classYear: "", dateUpdated: "2026-05-04" },
@@ -80,7 +83,6 @@ const TRANSFERS = [
   { id: "128", gender: "M", name: "Sarosh Rustomjee", status: "In Portal", previousSchool: "Niagara", newSchool: "", country: "England", utr: "9.74", classYear: "", dateUpdated: "2026-05-04" },
   { id: "127", gender: "M", name: "Adam Duda", status: "In Portal", previousSchool: "Boise State", newSchool: "", country: "Czech Republic", utr: "12.03", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "126", gender: "M", name: "Vanja Hodzic", status: "In Portal", previousSchool: "Florida Atlantic", newSchool: "", country: "Bosnia-Herzegovina", utr: "11.97", classYear: "Jr.", dateUpdated: "2026-05-04" },
-  { id: "125", gender: "M", name: "Seb Griffiths", status: "In Portal", previousSchool: "Alcorn State", newSchool: "", country: "Wales", utr: "10.83", classYear: "Fr.", dateUpdated: "2026-05-04" },
   { id: "124", gender: "M", name: "Tomáš Grime", status: "In Portal", previousSchool: "Alcorn State", newSchool: "", country: "England", utr: "10.23", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "123", gender: "M", name: "Victor Mayer", status: "In Portal", previousSchool: "Presbyterian", newSchool: "", country: "Canada", utr: "10.84", classYear: "Fr.", dateUpdated: "2026-05-04" },
   { id: "122", gender: "M", name: "Matej Kajzer", status: "In Portal", previousSchool: "Western Michigan", newSchool: "", country: "Canada", utr: "11.40", classYear: "Jr.", dateUpdated: "2026-05-04" },
@@ -274,7 +276,6 @@ const TRANSFERS = [
   { id: "209", gender: "W", name: "Sofia Mavor", status: "In Portal", previousSchool: "Air Force", newSchool: "", country: "Maine", utr: "8.81", classYear: "", dateUpdated: "2026-05-01" },
   { id: "208", gender: "W", name: "Alyssa Giupponi", status: "In Portal", previousSchool: "North Dakota", newSchool: "", country: "Switzerland", utr: "", classYear: "So.", dateUpdated: "2026-05-01" },
   { id: "207", gender: "W", name: "Polina Marakhtanova", status: "In Portal", previousSchool: "UC Davis", newSchool: "", country: "New York", utr: "", classYear: "", dateUpdated: "2026-05-01" },
-  { id: "206", gender: "W", name: "Elen Jantacova", status: "In Portal", previousSchool: "NAU", newSchool: "", country: "Czech Republic", utr: "9.12", classYear: "So.", dateUpdated: "2026-04-30" },
   { id: "205", gender: "W", name: "Rianna Coreisa", status: "In Portal", previousSchool: "Kennesaw State", newSchool: "", country: "Romania", utr: "8.80", classYear: "Fr.", dateUpdated: "2026-04-30" },
   { id: "204", gender: "W", name: "Madison McLeod", status: "In Portal", previousSchool: "UConn", newSchool: "", country: "Florida", utr: "", classYear: "Fr.", dateUpdated: "2026-04-30" },
   { id: "203", gender: "W", name: "Gian Octa", status: "Committed", previousSchool: "Missouri", newSchool: "Boston College", country: "Canada", utr: "9.96", classYear: "", dateUpdated: "2026-04-29" },
