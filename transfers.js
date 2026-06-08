@@ -12,8 +12,8 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
-  { id: "62", gender: "M", name: "Yazid Lahjomri", status: "Committed", previousSchool: "UT Arlington", newSchool: "UNLV", hometown: "Rabat, Morocco", country: "Morocco", utr: "12.57", classYear: "Jr.", dateUpdated: "2026-05-28" },
-  { id: "291", gender: "W", name: "Ni Xi", status: "Committed", previousSchool: "Charlotte", newSchool: "LSU", country: "China", utr: "10.39", classYear: "So.", dateUpdated: "2026-05-28" },
+  { id: "62", gender: "M", name: "Yazid Lahjomri", status: "Committed", previousSchool: "UT Arlington", newSchool: "UNLV", hometown: "Rabat, Morocco", country: "🇲🇦 Morocco", utr: "12.57", classYear: "Jr.", dateUpdated: "2026-05-28" },
+  { id: "291", gender: "W", name: "Ni Xi", status: "Committed", previousSchool: "Charlotte", newSchool: "LSU", country: "🇨🇳 China", utr: "10.39", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "289", gender: "M", name: "Jose Perez", status: "Committed", previousSchool: "Ferris State", newSchool: "Western Michigan", country: "Ecuador", utr: "12.06", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "290", gender: "M", name: "Mark Nawa", status: "Committed", previousSchool: "Auburn-Montgomery", newSchool: "North Carolina Central", country: "Botswana", utr: "11.32", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "287", gender: "M", name: "Imran Daniel Hazli", status: "Committed", previousSchool: "Baylor, San Diego State", newSchool: "Texas Tech", country: "Malaysia", utr: "12.71", classYear: "So.", dateUpdated: "2026-05-28" },
