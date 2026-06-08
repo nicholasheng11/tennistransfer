@@ -260,7 +260,7 @@
 
     // Known non-D1 (D2 / JUCO / NAIA) schools that appear in the data — excluded from "Mid-Major"
     // (which means a Division I program that isn't Power 4). Add to this list if a non-D1 school shows up.
-    const NON_D1 = new Set(["UIndy","Midwestern State","West Alabama","Saint Leo","Collin College","Middle Georgia State","Mississippi College","Le Moyne","Rollins College","Valdosta State"]);
+    const NON_D1 = new Set(["UIndy","Midwestern State","West Alabama","Saint Leo","Collin College","Middle Georgia State","Mississippi College","Le Moyne","Rollins College","Valdosta State","Ferris State","Auburn-Montgomery","Hawaii Pacific"]);
     const isMidMajor = school => {
       const s = mostRecentSchool(school);
       return !!s && !POWER4.has(s) && !NON_D1.has(s);
