@@ -12,6 +12,8 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "62", gender: "M", name: "Yazid Lahjomri", status: "Committed", previousSchool: "UT Arlington", newSchool: "UNLV", hometown: "Rabat, Morocco", country: "Morocco", utr: "12.57", classYear: "Jr.", dateUpdated: "2026-05-28" },
+  { id: "291", gender: "W", name: "Ni Xi", status: "Committed", previousSchool: "Charlotte", newSchool: "LSU", country: "China", utr: "10.39", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "289", gender: "M", name: "Jose Perez", status: "Committed", previousSchool: "Ferris State", newSchool: "Western Michigan", country: "Ecuador", utr: "12.06", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "290", gender: "M", name: "Mark Nawa", status: "Committed", previousSchool: "Auburn-Montgomery", newSchool: "North Carolina Central", country: "Botswana", utr: "11.32", classYear: "So.", dateUpdated: "2026-05-28" },
   { id: "287", gender: "M", name: "Imran Daniel Hazli", status: "Committed", previousSchool: "Baylor, San Diego State", newSchool: "Texas Tech", country: "Malaysia", utr: "12.71", classYear: "So.", dateUpdated: "2026-05-28" },
@@ -123,7 +125,6 @@ const TRANSFERS = [
   { id: "95", gender: "M", name: "Rudy Ceccon", status: "Committed", previousSchool: "LSU", newSchool: "Arkansas", hometown: "France", country: "France", utr: "12.85", classYear: "", dateUpdated: "2026-05-27" },
   { id: "96", gender: "M", name: "Miguel Ángel Machado", status: "Committed", previousSchool: "Bryant", newSchool: "Texas Tech", hometown: "Spain", country: "Spain", utr: "12.49", classYear: "", dateUpdated: "2026-05-27" },
   { id: "97", gender: "M", name: "Timo de Visser", status: "Committed", previousSchool: "Jacksonville State", newSchool: "Idaho State", hometown: "Netherlands", country: "Netherlands", utr: "12.20", classYear: "", dateUpdated: "2026-05-27" },
-  { id: "62", gender: "M", name: "Yazid Lahjomri", status: "In Portal", previousSchool: "UT Arlington", newSchool: "", hometown: "Rabat, Morocco", country: "Morocco", utr: "12.57", classYear: "Jr.", dateUpdated: "2026-05-27" },
   { id: "63", gender: "M", name: "Anirudh Nallaparaju", status: "In Portal", previousSchool: "Marist", newSchool: "", hometown: "Lyneham, Australia", country: "Australia", utr: "11.60", classYear: "So.", dateUpdated: "2026-05-27" },
   { id: "64", gender: "M", name: "Maxime Dubouch", status: "Committed", previousSchool: "Memphis", newSchool: "Georgia", hometown: "France", country: "France", utr: "13.17", classYear: "Gr.", dateUpdated: "2026-05-27" },
   { id: "65", gender: "M", name: "Boyd Schreiber", status: "Committed", previousSchool: "Gardner-Webb", newSchool: "Samford", hometown: "Australia", country: "Australia", utr: "12.04", classYear: "", dateUpdated: "2026-05-27" },
