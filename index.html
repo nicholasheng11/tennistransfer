@@ -44,6 +44,7 @@
     }
     header h1 { font-size: 19px; font-weight: 700; }
     header p  { font-size: 13px; opacity: 0.75; margin-top: 2px; }
+    header p.stats { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; letter-spacing: 0.2px; }
     header p.disclaimer { font-size: 11px; margin-top: 3px; line-height: 1.35; }
     /* Contact line — sits below the disclaimer. opacity:1 so the link can be a brighter
        sky-blue (#93c5fd) against the navy header, while the lead-in text stays muted. */
@@ -176,6 +177,7 @@
 <body>
   <header>
     <h1>🎾 D1 Tennis Transfer Tracker</h1>
+    <p id="stats" class="stats"></p>
     <p id="subtitle"></p>
     <p class="disclaimer">UTRs reflect each player's rating at the time their card was last updated, not live ratings. ITA doubles rankings reflect each player's team at their previous school.</p>
     <p class="contact">For updates, submissions, or fixes, email <a href="mailto:support@tennistransferportal.com">support@tennistransferportal.com</a></p>
@@ -361,6 +363,16 @@
       });
     }
 
+    // Header stats line — counts respect the currently selected gender pill.
+    const statsEl = document.getElementById("stats");
+    function refreshStats() {
+      const within = TRANSFERS.filter(p => genderMatch(p, activeGender));
+      const total = within.length;
+      const committed = within.filter(p => p.status === "Committed").length;
+      const inPortal = within.filter(p => p.status === "In Portal").length;
+      statsEl.textContent = "📊 " + total + " players · " + committed + " committed · " + inPortal + " in portal";
+    }
+
     // Subtitle shows the most recent dateUpdated across all players.
     const latest = TRANSFERS.reduce((mx, p) => (p.dateUpdated > mx ? p.dateUpdated : mx), "");
     subtitleEl.textContent = latest ? "Last updated: " + formatLong(latest) : "Updated by hand";
@@ -376,6 +388,7 @@
         document.querySelectorAll('.filter-btn[data-gender]')
           .forEach(b => b.classList.toggle("active", b.dataset.gender === g));
         refreshStatusPills();
+        refreshStats();
         render();
       };
       genderFiltersEl.appendChild(btn);
@@ -523,6 +536,7 @@
       }).join("");
     }
 
+    refreshStats();   // initial header counts
     render(); // draw everything for the first time
   </script>
 </body>
