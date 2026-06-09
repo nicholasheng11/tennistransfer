@@ -428,18 +428,21 @@
       }
 
       // 3. sort
-      if (sortBy === "rankHigh" || sortBy === "rankLow") {
+      // "To Team ITA High" is a sort-aware filter: when it's active, we force best-team-rank-first
+      // ordering (Texas #2 above Texas A&M #11 above ... #75) regardless of the Sort dropdown.
+      const effectiveSort = (p4Filter === "ttop") ? "rankHigh" : sortBy;
+      if (effectiveSort === "rankHigh" || effectiveSort === "rankLow") {
         // By destination ITA rank. Ranked schools first (asc for High, desc for Low);
         // unranked / In Portal sort to the bottom, newest-first among themselves.
         players.sort((a, b) => {
           const ra = rankOf(a.newSchool, a.gender), rb = rankOf(b.newSchool, b.gender);
           const aR = ra != null, bR = rb != null;
-          if (aR && bR) return sortBy === "rankHigh" ? ra - rb : rb - ra;
+          if (aR && bR) return effectiveSort === "rankHigh" ? ra - rb : rb - ra;
           if (aR) return -1;
           if (bR) return 1;
           return b.dateUpdated.localeCompare(a.dateUpdated);
         });
-      } else if (sortBy === "utr") {
+      } else if (effectiveSort === "utr") {
         // Highest UTR first; players with no UTR sort to the bottom (newest-first tiebreak).
         players.sort((a, b) => {
           const ua = parseFloat(a.utr), ub = parseFloat(b.utr);
@@ -449,7 +452,7 @@
           if (bH) return 1;
           return b.dateUpdated.localeCompare(a.dateUpdated);
         });
-      } else if (sortBy === "singles") {
+      } else if (effectiveSort === "singles") {
         // Best ITA singles ranking first (#1 first); players outside top 125 to the bottom (newest-first tiebreak).
         players.sort((a, b) => {
           const ra = singlesRankOf(a.name, a.gender), rb = singlesRankOf(b.name, b.gender);
@@ -459,9 +462,9 @@
           if (bR) return 1;
           return b.dateUpdated.localeCompare(a.dateUpdated);
         });
-      } else if (sortBy === "newSchool") {
+      } else if (effectiveSort === "newSchool") {
         players.sort((a, b) => (a.newSchool || "￿").localeCompare(b.newSchool || "￿"));
-      } else if (sortBy === "prevSchool") {
+      } else if (effectiveSort === "prevSchool") {
         players.sort((a, b) => a.previousSchool.localeCompare(b.previousSchool));
       } else {
         players.sort((a, b) => b.dateUpdated.localeCompare(a.dateUpdated));
