@@ -420,10 +420,10 @@
       } else if (p4Filter === "frommid") {
         players = players.filter(p => isMidMajor(p.previousSchool));
       } else if (p4Filter === "ttop") {
-        // Only players committing to a nationally-ranked program (Team ITA top 25 for their gender).
+        // Only players committing to a Team ITA-ranked program (top 75 — full coverage of the rankings file).
         players = players.filter(p => {
           const r = rankOf(p.newSchool, p.gender);
-          return r != null && r <= 25;
+          return r != null && r <= 75;
         });
       }
 
