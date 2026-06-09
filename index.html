@@ -188,6 +188,7 @@
       <div class="sortwrap">
         <label for="sort">Sort:</label>
         <select id="sort">
+          <option value="committed">Recently committed</option>
           <option value="newest">Newest</option>
           <option value="rankHigh">Highest ranked destination</option>
           <option value="rankLow">Lowest ranked destination</option>
@@ -455,6 +456,15 @@
           if (aR && bR) return sortBy === "rankHigh" ? ra - rb : rb - ra;
           if (aR) return -1;
           if (bR) return 1;
+          return b.dateUpdated.localeCompare(a.dateUpdated);
+        });
+      } else if (sortBy === "committed") {
+        // Committed players first (most recently committed at top), then In Portal (also newest first).
+        // Within each group, dateUpdated desc — same lexicographic compare works for both date-only and ISO datetime.
+        players.sort((a, b) => {
+          const aC = a.status === "Committed";
+          const bC = b.status === "Committed";
+          if (aC !== bC) return aC ? -1 : 1;
           return b.dateUpdated.localeCompare(a.dateUpdated);
         });
       } else if (sortBy === "utr") {
