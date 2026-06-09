@@ -12,6 +12,7 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "156", gender: "M", name: "Braden Hannig", status: "Committed", previousSchool: "South Alabama", newSchool: "Alabama", country: "Alabama", utr: "12.54", classYear: "", dateUpdated: "2026-06-09" },
   { id: "292", gender: "M", name: "Tyler Bowers", status: "Committed", previousSchool: "Illinois", newSchool: "Auburn", country: "", utr: "12.45", classYear: "Gr.", dateUpdated: "2026-06-09" },
   { id: "281", gender: "M", name: "Alessio Vasquez", status: "Committed", previousSchool: "LSU", newSchool: "UCLA", country: "Germany", utr: "13.05", classYear: "Gr.", dateUpdated: "2026-06-09" },
   { id: "62", gender: "M", name: "Yazid Lahjomri", status: "Committed", previousSchool: "UT Arlington", newSchool: "UNLV", hometown: "Rabat, Morocco", country: "Morocco", utr: "12.57", classYear: "Jr.", dateUpdated: "2026-05-28" },
@@ -61,7 +62,6 @@ const TRANSFERS = [
   { id: "160", gender: "M", name: "Walker Valentine", status: "In Portal", previousSchool: "North Dakota", newSchool: "", country: "Australia", utr: "11.07", classYear: "", dateUpdated: "2026-05-04" },
   { id: "159", gender: "M", name: "Felipe Spagnuolo", status: "In Portal", previousSchool: "Nicholls State", newSchool: "", country: "Argentina", utr: "11.39", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "157", gender: "M", name: "Adrien Ducruet", status: "In Portal", previousSchool: "Saint Louis", newSchool: "", country: "France", utr: "11.17", classYear: "So.", dateUpdated: "2026-05-04" },
-  { id: "156", gender: "M", name: "Braden Hannig", status: "In Portal", previousSchool: "South Alabama", newSchool: "", country: "Alabama", utr: "12.54", classYear: "", dateUpdated: "2026-05-04" },
   { id: "155", gender: "M", name: "Kotaro Matsumura", status: "In Portal", previousSchool: "North Dakota", newSchool: "", country: "Japan", utr: "11.70", classYear: "", dateUpdated: "2026-05-04" },
   { id: "154", gender: "M", name: "Hoang Anh Pham", status: "In Portal", previousSchool: "South Carolina State", newSchool: "", country: "Vietnam", utr: "12.00", classYear: "Fr.", dateUpdated: "2026-05-04" },
   { id: "153", gender: "M", name: "Maxime Aremon", status: "In Portal", previousSchool: "Cleveland State", newSchool: "", country: "France", utr: "11.66", classYear: "", dateUpdated: "2026-05-04" },
