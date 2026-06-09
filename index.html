@@ -146,6 +146,10 @@
     .singles { font-weight: 600; cursor: help; }
     .utr-note { font-size: 0.75em; color: #9ca3af; font-weight: 400; }
 
+    /* Stack the badge + small date stamp in the top-right of each card. */
+    .card-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .card-date { font-size: 11px; color: #9ca3af; font-weight: 500; cursor: help; }
+
     /* ---- Status badges (one color per status) ------------------------- */
     .badge {
       flex: 0 0 auto;
@@ -303,28 +307,34 @@
         ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
     }
 
-    // "2026-05-26" -> "May 26, 2026"
+    // Strip the optional time component from a dateUpdated value, e.g.
+    // "2026-05-28T15:30" -> "2026-05-28". Existing date-only entries pass through unchanged.
+    function dateOnly(iso) { return iso ? iso.split("T")[0] : ""; }
+
+    // "2026-05-26" or "2026-05-26T15:30" -> "May 26, 2026"
     function formatLong(iso) {
-      if (!iso) return "";
+      const ymd = dateOnly(iso);
+      if (!ymd) return "";
       const months = ["January","February","March","April","May","June",
                       "July","August","September","October","November","December"];
-      const p = iso.split("-");
+      const p = ymd.split("-");
       return months[Number(p[1]) - 1] + " " + Number(p[2]) + ", " + p[0];
     }
 
-    // Relative "Updated ..." label from a YYYY-MM-DD date.
-    function relativeUpdated(iso) {
-      if (!iso) return "";
-      const p = iso.split("-");
+    // Short relative date for card stamp: "Today", "Yesterday", "3d ago", "Jun 4".
+    function shortDate(iso) {
+      const ymd = dateOnly(iso);
+      if (!ymd) return "";
+      const p = ymd.split("-");
       const then = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const days = Math.round((today - then) / 86400000);
-      if (days <= 0) return "Updated today";
-      if (days === 1) return "Updated yesterday";
-      if (days <= 6) return "Updated " + days + " days ago";
+      if (days <= 0) return "Today";
+      if (days === 1) return "Yesterday";
+      if (days <= 6) return days + "d ago";
       const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-      return "Updated " + mon[then.getMonth()] + " " + then.getDate();
+      return mon[then.getMonth()] + " " + then.getDate();
     }
 
     // Does a player match the selected gender pill? "All" matches everyone.
@@ -494,13 +504,18 @@
         // Bottom meta line: country and/or UTR. Hidden entirely if both empty.
         const metaParts = [];
         if (p.country) metaParts.push(esc(p.country));
-        if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
+        if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(dateOnly(p.dateUpdated)) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
         const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
+        const stamp = shortDate(p.dateUpdated);
+        const stampTag = stamp ? '<div class="card-date" title="Updated ' + esc(formatLong(p.dateUpdated)) + '">' + esc(stamp) + '</div>' : '';
         return `
           <div class="card">
             <div class="card-top">
               <div class="name">${esc(p.name)}${inlineRank}</div>
-              <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
+              <div class="card-meta-right">
+                <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
+                ${stampTag}
+              </div>
             </div>
             <div class="schools">${schools}</div>
             ${meta}

@@ -194,9 +194,14 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
     const $ = id => document.getElementById(id);
     const DATA = (typeof TRANSFERS !== "undefined" && Array.isArray(TRANSFERS)) ? TRANSFERS : [];
 
+    // Returns an ISO datetime stamp like "2026-05-28T15:30" so same-day entries sort by
+    // time-of-day on the tracker (which sorts dateUpdated lexicographically). Older date-only
+    // entries still work — they just sort below any timestamped entry on the same day.
     function todayISO() {
       const d = new Date();
-      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      const pad = n => String(n).padStart(2, "0");
+      return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) +
+        "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
     }
 
     // Build one transfers.js line. JSON.stringify on each value = safe, valid, escaped.
