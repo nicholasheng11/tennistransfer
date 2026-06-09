@@ -147,10 +147,6 @@
     .singles { font-weight: 600; cursor: help; }
     .utr-note { font-size: 0.75em; color: #9ca3af; font-weight: 400; }
 
-    /* Stack the badge + small date stamp in the top-right of each card. */
-    .card-meta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-    .card-date { font-size: 11px; color: #9ca3af; font-weight: 500; cursor: help; }
-
     /* ---- Status badges (one color per status) ------------------------- */
     .badge {
       flex: 0 0 auto;
@@ -529,16 +525,11 @@
         if (p.country) metaParts.push(esc(p.country));
         if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(dateOnly(p.dateUpdated)) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
         const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
-        const stamp = shortDate(p.dateUpdated);
-        const stampTag = stamp ? '<div class="card-date" title="Updated ' + esc(formatLong(p.dateUpdated)) + '">' + esc(stamp) + '</div>' : '';
         return `
           <div class="card">
             <div class="card-top">
               <div class="name">${esc(p.name)}${inlineRank}</div>
-              <div class="card-meta-right">
-                <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
-                ${stampTag}
-              </div>
+              <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
             </div>
             <div class="schools">${schools}</div>
             ${meta}
