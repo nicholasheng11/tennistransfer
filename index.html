@@ -306,34 +306,13 @@
         ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
     }
 
-    // Strip the optional time component from a dateUpdated value, e.g.
-    // "2026-05-28T15:30" -> "2026-05-28". Existing date-only entries pass through unchanged.
-    function dateOnly(iso) { return iso ? iso.split("T")[0] : ""; }
-
-    // "2026-05-26" or "2026-05-26T15:30" -> "May 26, 2026"
+    // "2026-05-26" -> "May 26, 2026"
     function formatLong(iso) {
-      const ymd = dateOnly(iso);
-      if (!ymd) return "";
+      if (!iso) return "";
       const months = ["January","February","March","April","May","June",
                       "July","August","September","October","November","December"];
-      const p = ymd.split("-");
+      const p = iso.split("-");
       return months[Number(p[1]) - 1] + " " + Number(p[2]) + ", " + p[0];
-    }
-
-    // Short relative date for card stamp: "Today", "Yesterday", "3d ago", "Jun 4".
-    function shortDate(iso) {
-      const ymd = dateOnly(iso);
-      if (!ymd) return "";
-      const p = ymd.split("-");
-      const then = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const days = Math.round((today - then) / 86400000);
-      if (days <= 0) return "Today";
-      if (days === 1) return "Yesterday";
-      if (days <= 6) return days + "d ago";
-      const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-      return mon[then.getMonth()] + " " + then.getDate();
     }
 
     // Does a player match the selected gender pill? "All" matches everyone.
@@ -523,7 +502,7 @@
         // Bottom meta line: country and/or UTR. Hidden entirely if both empty.
         const metaParts = [];
         if (p.country) metaParts.push(esc(p.country));
-        if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(dateOnly(p.dateUpdated)) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
+        if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
         const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
         return `
           <div class="card">
