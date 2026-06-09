@@ -12,6 +12,7 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "292", gender: "M", name: "Tyler Bowers", status: "Committed", previousSchool: "Illinois", newSchool: "Auburn", country: "", utr: "12.45", classYear: "Gr.", dateUpdated: "2026-06-09" },
   { id: "281", gender: "M", name: "Alessio Vasquez", status: "Committed", previousSchool: "LSU", newSchool: "UCLA", country: "Germany", utr: "13.05", classYear: "Gr.", dateUpdated: "2026-06-09" },
   { id: "62", gender: "M", name: "Yazid Lahjomri", status: "Committed", previousSchool: "UT Arlington", newSchool: "UNLV", hometown: "Rabat, Morocco", country: "Morocco", utr: "12.57", classYear: "Jr.", dateUpdated: "2026-05-28" },
   { id: "291", gender: "W", name: "Ni Xi", status: "Committed", previousSchool: "Charlotte", newSchool: "LSU", country: "China", utr: "10.39", classYear: "So.", dateUpdated: "2026-05-28" },
