@@ -12,6 +12,7 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "140", gender: "M", name: "Kostiantyn Mantach", status: "Committed", previousSchool: "VCU", newSchool: "Belmont", country: "Ukraine", utr: "11.44", classYear: "So.", dateUpdated: "2026-06-09" },
   { id: "156", gender: "M", name: "Braden Hannig", status: "Committed", previousSchool: "South Alabama", newSchool: "Alabama", country: "Alabama", utr: "12.54", classYear: "", dateUpdated: "2026-06-09" },
   { id: "292", gender: "M", name: "Tyler Bowers", status: "Committed", previousSchool: "Illinois", newSchool: "Auburn", country: "", utr: "12.45", classYear: "Gr.", dateUpdated: "2026-06-09" },
   { id: "281", gender: "M", name: "Alessio Vasquez", status: "Committed", previousSchool: "LSU", newSchool: "UCLA", country: "Germany", utr: "13.05", classYear: "Gr.", dateUpdated: "2026-06-09" },
@@ -76,7 +77,6 @@ const TRANSFERS = [
   { id: "143", gender: "M", name: "Gonzalo Cotter", status: "In Portal", previousSchool: "New Orleans", newSchool: "", country: "Spain", utr: "10.86", classYear: "", dateUpdated: "2026-05-04" },
   { id: "142", gender: "M", name: "Cyrus Ahmad", status: "In Portal", previousSchool: "Loyola Marymount", newSchool: "", country: "California", utr: "12.01", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "141", gender: "M", name: "Bautista Durrels Rojo", status: "In Portal", previousSchool: "Belmont", newSchool: "", country: "Argentina", utr: "11.52", classYear: "Fr.", dateUpdated: "2026-05-04" },
-  { id: "140", gender: "M", name: "Kostiantyn Mantach", status: "In Portal", previousSchool: "VCU", newSchool: "", country: "Ukraine", utr: "11.60", classYear: "So.", dateUpdated: "2026-05-04" },
   { id: "139", gender: "M", name: "Jonas Keck", status: "In Portal", previousSchool: "Western Michigan", newSchool: "", country: "Germany", utr: "11.39", classYear: "Fr.", dateUpdated: "2026-05-04" },
   { id: "138", gender: "M", name: "Hugo Car", status: "In Portal", previousSchool: "USF", newSchool: "", country: "France", utr: "13.40", classYear: "Gr.", dateUpdated: "2026-05-04" },
   { id: "136", gender: "M", name: "Max Relic", status: "In Portal", previousSchool: "Utah", newSchool: "", country: "England", utr: "12.69", classYear: "", dateUpdated: "2026-05-04" },
