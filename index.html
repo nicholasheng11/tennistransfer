@@ -222,6 +222,10 @@
           <option value="ttop">To Team ITA High</option>
         </select>
       </div>
+      <div class="sortwrap">
+        <label for="country">Country:</label>
+        <select id="country"></select>
+      </div>
     </div>
   </header>
 
@@ -248,6 +252,7 @@
     let searchText = "";
     let sortBy = "newest";
     let p4Filter = "all";
+    let countryFilter = "all";
 
     // Page elements we'll be updating.
     const grid = document.getElementById("grid");
@@ -257,6 +262,7 @@
     const searchEl = document.getElementById("search");
     const sortEl = document.getElementById("sort");
     const p4El = document.getElementById("p4");
+    const countryEl = document.getElementById("country");
     const subtitleEl = document.getElementById("subtitle");
 
     // Power 4 conference members (ACC, SEC, Big Ten, Big 12) — drives the "Schools" filter.
@@ -405,6 +411,15 @@
     searchEl.oninput = () => { searchText = searchEl.value.toLowerCase(); render(); };
     sortEl.onchange  = () => { sortBy = sortEl.value; render(); };
     p4El.onchange    = () => { p4Filter = p4El.value; render(); };
+    countryEl.onchange = () => { countryFilter = countryEl.value; render(); };
+
+    // Populate the Country dropdown dynamically from every unique country in the data,
+    // sorted alphabetically. "All countries" comes first.
+    (function populateCountries() {
+      const uniq = [...new Set(TRANSFERS.map(p => p.country).filter(Boolean))].sort();
+      countryEl.innerHTML = '<option value="all">All countries</option>' +
+        uniq.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join("");
+    })();
 
     // The main function: decide which players to show, then draw them.
     function render() {
@@ -425,6 +440,11 @@
         players = players.filter(p =>
           (p.name + " " + p.previousSchool + " " + p.newSchool)
             .toLowerCase().includes(searchText));
+      }
+
+      // 2a. filter by selected country (exact match on the `country` field, e.g., "France", "Texas").
+      if (countryFilter !== "all") {
+        players = players.filter(p => p.country === countryFilter);
       }
 
       // 2b. School filter: Power 4 or Mid-Major, by destination ("to") or origin ("from")
