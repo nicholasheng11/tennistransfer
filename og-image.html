@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OG Image Renderer — Tennis Transfer Tracker</title>
+  <style>
+    body { margin: 0; background: #f4f5f7; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 24px; }
+    .instructions {
+      max-width: 1200px; margin: 0 auto 24px;
+      padding: 16px 24px;
+      background: #fef3c7; border-left: 4px solid #f59e0b; color: #78350f;
+      font-size: 14px; line-height: 1.65; border-radius: 6px;
+    }
+    .instructions h2 { margin: 0 0 6px; font-size: 16px; }
+    .instructions ol { margin: 0; padding-left: 22px; }
+    .instructions code { background: #fde68a; padding: 1px 6px; border-radius: 4px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+
+    /* The actual 1200x630 image — fixed dimensions, do NOT change. */
+    .og {
+      width: 1200px;
+      height: 630px;
+      background: linear-gradient(135deg, #11203a 0%, #1f3460 55%, #11203a 100%);
+      color: #ffffff;
+      box-sizing: border-box;
+      padding: 90px 100px;
+      margin: 0 auto;
+      overflow: hidden;
+      position: relative;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    /* Soft green glow in the top-right — adds depth without being busy. */
+    .og::before {
+      content: ""; position: absolute; top: -140px; right: -140px;
+      width: 620px; height: 620px;
+      background: radial-gradient(circle, rgba(34, 197, 94, 0.16) 0%, transparent 65%);
+      border-radius: 50%;
+    }
+    /* Mirror glow in the bottom-left for balance. */
+    .og::after {
+      content: ""; position: absolute; bottom: -160px; left: -160px;
+      width: 540px; height: 540px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 65%);
+      border-radius: 50%;
+    }
+
+    .ball   { position: relative; font-size: 120px; line-height: 1; margin-bottom: 24px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
+    .title  { position: relative; font-size: 78px; font-weight: 800; margin: 0 0 22px; line-height: 1.04; letter-spacing: -1.5px; }
+    .accent { color: #34d399; }
+    .tagline{ position: relative; font-size: 32px; font-weight: 500; opacity: 0.85; margin: 0; }
+    .domain { position: absolute; bottom: 42px; left: 0; right: 0; font-size: 22px; font-weight: 600; opacity: 0.55; letter-spacing: 2px; text-transform: lowercase; }
+  </style>
+</head>
+<body>
+  <div class="instructions">
+    <h2>How to export this as the social-preview image</h2>
+    <ol>
+      <li>This page must be opened locally — <strong>not</strong> linked from anywhere on the live site.</li>
+      <li>Open this file in Chrome or Edge: right-click anywhere in the navy card below → <em>Inspect</em>.</li>
+      <li>In the Elements panel, locate the <code>&lt;div class="og"&gt;</code> element. Right-click it → <em>Capture node screenshot</em>.</li>
+      <li>Chrome saves a PNG at the element's exact size (1200×630). Move/rename it to <code>og-image.png</code> in this folder, next to <code>index.html</code>.</li>
+      <li>Tell me when it's in the repo and I'll update the <code>og:image</code> / <code>twitter:image</code> meta tags in <code>index.html</code> to point at it.</li>
+    </ol>
+    <p style="margin: 12px 0 0; font-size: 13px;">If you'd rather use a different tool: any 1200×630 PNG with this layout works. The dimensions are what matter for Twitter/X, iMessage, Slack, etc. to render a large preview card.</p>
+  </div>
+
+  <div class="og">
+    <div class="ball">🎾</div>
+    <h1 class="title">D1 Tennis <span class="accent">Transfer</span> Tracker</h1>
+    <p class="tagline">Live commits &middot; UTRs &middot; ITA rankings</p>
+    <p class="domain">tennistransferportal.com</p>
+  </div>
+</body>
+</html>
