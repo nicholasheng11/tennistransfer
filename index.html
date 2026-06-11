@@ -215,6 +215,10 @@
           <option value="bigten">To Big Ten</option>
           <option value="big12">To Big 12</option>
           <option value="acc">To ACC</option>
+          <option value="fromsec">From SEC</option>
+          <option value="frombigten">From Big Ten</option>
+          <option value="frombig12">From Big 12</option>
+          <option value="fromacc">From ACC</option>
           <option value="ttop">To Team ITA High</option>
         </select>
       </div>
@@ -440,6 +444,15 @@
         players = players.filter(p => BIG_12.has(p.newSchool));
       } else if (p4Filter === "acc") {
         players = players.filter(p => ACC.has(p.newSchool));
+      } else if (p4Filter === "fromsec") {
+        // Use mostRecentSchool so multi-stop transfers like "Lehigh, Southern Miss" match on their LAST stop.
+        players = players.filter(p => SEC.has(mostRecentSchool(p.previousSchool)));
+      } else if (p4Filter === "frombigten") {
+        players = players.filter(p => BIG_TEN.has(mostRecentSchool(p.previousSchool)));
+      } else if (p4Filter === "frombig12") {
+        players = players.filter(p => BIG_12.has(mostRecentSchool(p.previousSchool)));
+      } else if (p4Filter === "fromacc") {
+        players = players.filter(p => ACC.has(mostRecentSchool(p.previousSchool)));
       } else if (p4Filter === "ttop") {
         // Only players committing to a Team ITA-ranked program (top 75 — full coverage of the rankings file).
         players = players.filter(p => {
