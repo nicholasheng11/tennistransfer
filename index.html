@@ -227,7 +227,7 @@
         </select>
       </div>
       <div class="sortwrap">
-        <label for="country">Country:</label>
+        <label for="country">From:</label>
         <select id="country"></select>
       </div>
     </div>
@@ -436,12 +436,25 @@
     p4El.onchange    = () => { p4Filter = p4El.value; render(); };
     countryEl.onchange = () => { countryFilter = countryEl.value; render(); };
 
-    // Populate the Country dropdown dynamically from every unique country in the data,
-    // sorted alphabetically. "All countries" comes first.
+    // Populate the From dropdown dynamically from every unique value in the `country` field.
+    // The field is overloaded — US players have their state there, international players have their country.
+    // We split the values into two <optgroup>s so the dropdown shows them as distinct sections.
     (function populateCountries() {
+      const US_STATES = new Set([
+        "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia",
+        "Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland",
+        "Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey",
+        "New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina",
+        "South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"
+      ]);
       const uniq = [...new Set(TRANSFERS.map(p => p.country).filter(Boolean))].sort();
-      countryEl.innerHTML = '<option value="all">All countries</option>' +
-        uniq.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join("");
+      const countries = uniq.filter(c => !US_STATES.has(c));
+      const states = uniq.filter(c => US_STATES.has(c));
+      const optionList = arr => arr.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join("");
+      let html = '<option value="all">All</option>';
+      if (countries.length) html += '<optgroup label="Countries">' + optionList(countries) + '</optgroup>';
+      if (states.length)    html += '<optgroup label="US States">' + optionList(states) + '</optgroup>';
+      countryEl.innerHTML = html;
     })();
 
     // The main function: decide which players to show, then draw them.
