@@ -194,10 +194,10 @@
         <label for="p4">Schools:</label>
         <select id="p4">
           <option value="all">All schools</option>
-          <option value="p4p4">P4 to P4</option>
-          <option value="p4mid">P4 to Mid-Major</option>
-          <option value="midp4">Mid-Major to P4</option>
-          <option value="midmid">Mid-Major to Mid-Major</option>
+          <option value="sec">To SEC</option>
+          <option value="bigten">To Big Ten</option>
+          <option value="big12">To Big 12</option>
+          <option value="acc">To ACC</option>
           <option value="ttop">To Team ITA High</option>
         </select>
       </div>
@@ -240,16 +240,13 @@
 
     // Power 4 conference members (ACC, SEC, Big Ten, Big 12) — drives the "Schools" filter.
     // Edit this list if a school is missing or the spelling doesn't match your data.
-    const POWER4 = new Set([
-      // SEC
-      "Alabama","Arkansas","Auburn","Florida","Georgia","Kentucky","LSU","Mississippi State","Missouri","Oklahoma","Ole Miss","South Carolina","Tennessee","Texas","Texas A&M","Vanderbilt",
-      // Big Ten
-      "Illinois","Indiana","Iowa","Maryland","Michigan","Michigan State","Minnesota","Nebraska","Northwestern","Ohio State","Oregon","Penn State","Purdue","Rutgers","UCLA","USC","Washington","Wisconsin",
-      // Big 12
-      "Arizona","Arizona State","Baylor","BYU","UCF","Cincinnati","Colorado","Houston","Iowa State","Kansas","Kansas State","Oklahoma State","TCU","Texas Tech","Utah","West Virginia",
-      // ACC
-      "Boston College","California","Cal","Clemson","Duke","Florida State","Georgia Tech","Louisville","Miami","Miami (FL)","NC State","North Carolina","UNC","Notre Dame","Pitt","Pittsburgh","SMU","Stanford","Syracuse","Virginia","Virginia Tech","Wake Forest"
-    ]);
+    // Power 4 conference rosters — single source of truth. To edit, just update the right Set
+    // (e.g., when a team changes conferences). POWER4 below is computed from them.
+    const SEC = new Set(["Alabama","Arkansas","Auburn","Florida","Georgia","Kentucky","LSU","Mississippi State","Missouri","Oklahoma","Ole Miss","South Carolina","Tennessee","Texas","Texas A&M","Vanderbilt"]);
+    const BIG_TEN = new Set(["Illinois","Indiana","Iowa","Maryland","Michigan","Michigan State","Minnesota","Nebraska","Northwestern","Ohio State","Oregon","Penn State","Purdue","Rutgers","UCLA","USC","Washington","Wisconsin"]);
+    const BIG_12 = new Set(["Arizona","Arizona State","Baylor","BYU","UCF","Cincinnati","Colorado","Houston","Iowa State","Kansas","Kansas State","Oklahoma State","TCU","Texas Tech","Utah","West Virginia"]);
+    const ACC = new Set(["Boston College","California","Cal","Clemson","Duke","Florida State","Georgia Tech","Louisville","Miami","Miami (FL)","NC State","North Carolina","UNC","Notre Dame","Pitt","Pittsburgh","SMU","Stanford","Syracuse","Virginia","Virginia Tech","Wake Forest"]);
+    const POWER4 = new Set([...SEC, ...BIG_TEN, ...BIG_12, ...ACC]);
     // Some players have a comma-separated `previousSchool` listing multiple stops
     // (e.g. "UCF, Oklahoma State"). For P4 / Mid-Major classification, what matters is
     // the LAST one — the school they're actually transferring FROM right now.
@@ -410,14 +407,14 @@
       }
 
       // 2b. School filter: Power 4 or Mid-Major, by destination ("to") or origin ("from")
-      if (p4Filter === "p4p4") {
-        players = players.filter(p => isP4(p.previousSchool) && isP4(p.newSchool));
-      } else if (p4Filter === "p4mid") {
-        players = players.filter(p => isP4(p.previousSchool) && isMidMajor(p.newSchool));
-      } else if (p4Filter === "midp4") {
-        players = players.filter(p => isMidMajor(p.previousSchool) && isP4(p.newSchool));
-      } else if (p4Filter === "midmid") {
-        players = players.filter(p => isMidMajor(p.previousSchool) && isMidMajor(p.newSchool));
+      if (p4Filter === "sec") {
+        players = players.filter(p => SEC.has(p.newSchool));
+      } else if (p4Filter === "bigten") {
+        players = players.filter(p => BIG_TEN.has(p.newSchool));
+      } else if (p4Filter === "big12") {
+        players = players.filter(p => BIG_12.has(p.newSchool));
+      } else if (p4Filter === "acc") {
+        players = players.filter(p => ACC.has(p.newSchool));
       } else if (p4Filter === "ttop") {
         // Only players committing to a Team ITA-ranked program (top 75 — full coverage of the rankings file).
         players = players.filter(p => {
