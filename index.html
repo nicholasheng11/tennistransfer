@@ -186,7 +186,6 @@
         <select id="sort">
           <option value="newest">Newest</option>
           <option value="rankHigh">Highest ranked destination</option>
-          <option value="rankLow">Lowest ranked destination</option>
           <option value="utr">Highest UTR</option>
           <option value="singles">Singles ITA High</option>
         </select>
@@ -431,13 +430,13 @@
       // "To Team ITA High" is a sort-aware filter: when it's active, we force best-team-rank-first
       // ordering (Texas #2 above Texas A&M #11 above ... #75) regardless of the Sort dropdown.
       const effectiveSort = (p4Filter === "ttop") ? "rankHigh" : sortBy;
-      if (effectiveSort === "rankHigh" || effectiveSort === "rankLow") {
-        // By destination ITA rank. Ranked schools first (asc for High, desc for Low);
-        // unranked / In Portal sort to the bottom, newest-first among themselves.
+      if (effectiveSort === "rankHigh") {
+        // By destination ITA rank, best (#1) first. Unranked / In Portal players sort
+        // to the bottom, newest-first among themselves.
         players.sort((a, b) => {
           const ra = rankOf(a.newSchool, a.gender), rb = rankOf(b.newSchool, b.gender);
           const aR = ra != null, bR = rb != null;
-          if (aR && bR) return effectiveSort === "rankHigh" ? ra - rb : rb - ra;
+          if (aR && bR) return ra - rb;
           if (aR) return -1;
           if (bR) return 1;
           return b.dateUpdated.localeCompare(a.dateUpdated);
