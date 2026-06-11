@@ -58,6 +58,9 @@
     header h1 { font-size: 19px; font-weight: 700; }
     header p  { font-size: 13px; opacity: 0.75; margin-top: 2px; }
     header p.stats { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; letter-spacing: 0.2px; }
+    /* Top destinations leaderboard — a single line of "School (N)" tokens, scrollable on mobile. */
+    header p.top-dest { font-size: 12px; opacity: 0.85; margin-top: 3px; line-height: 1.4; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+    header p.top-dest:empty { display: none; }
     header p.disclaimer { font-size: 11px; margin-top: 3px; line-height: 1.35; }
     /* Contact line — sits below the disclaimer. opacity:1 so the link can be a brighter
        sky-blue (#93c5fd) against the navy header, while the lead-in text stays muted. */
@@ -187,6 +190,7 @@
   <header>
     <h1>🎾 D1 Tennis Transfer Tracker</h1>
     <p id="stats" class="stats"></p>
+    <p id="top-destinations" class="top-dest"></p>
     <p id="subtitle"></p>
     <p class="disclaimer">UTRs reflect each player's rating at the time their card was last updated, not live ratings. ITA doubles rankings reflect each player's team at their previous school.</p>
     <p class="contact">For updates, submissions, or fixes, email <a href="mailto:support@tennistransferportal.com">support@tennistransferportal.com</a></p>
@@ -372,6 +376,24 @@
       statsEl.textContent = "📊 " + total + " players · " + committed + " committed · " + inPortal + " in portal";
     }
 
+    // Top destinations leaderboard — schools with the most committed transfers (for the active gender).
+    // Only shows schools with 2+ commits to avoid surfacing long tails of one-off destinations.
+    const topDestEl = document.getElementById("top-destinations");
+    function refreshTopDestinations() {
+      const counts = {};
+      TRANSFERS.forEach(p => {
+        if (!genderMatch(p, activeGender) || p.status !== "Committed" || !p.newSchool) return;
+        counts[p.newSchool] = (counts[p.newSchool] || 0) + 1;
+      });
+      const top = Object.entries(counts)
+        .filter(entry => entry[1] >= 2)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8);
+      topDestEl.textContent = top.length
+        ? "📈 Top destinations: " + top.map(([school, n]) => school + " (" + n + ")").join(" · ")
+        : "";
+    }
+
     // Subtitle shows the most recent dateUpdated across all players.
     const latest = TRANSFERS.reduce((mx, p) => (p.dateUpdated > mx ? p.dateUpdated : mx), "");
     subtitleEl.textContent = latest ? "Last updated: " + formatLong(latest) : "Updated by hand";
@@ -388,6 +410,7 @@
           .forEach(b => b.classList.toggle("active", b.dataset.gender === g));
         refreshStatusPills();
         refreshStats();
+        refreshTopDestinations();
         render();
       };
       genderFiltersEl.appendChild(btn);
@@ -571,6 +594,7 @@
     }
 
     refreshStats();   // initial header counts
+    refreshTopDestinations();   // initial leaderboard line
     render(); // draw everything for the first time
   </script>
 </body>
