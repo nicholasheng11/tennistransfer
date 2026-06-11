@@ -144,6 +144,33 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(17, 32, 58, 0.10);
     }
+    /* Footer "About this tracker" expandable panel. Uses native <details>/<summary>. */
+    footer.about {
+      max-width: 1200px; margin: 24px auto 60px; padding: 0 16px;
+    }
+    footer.about details {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 0;
+    }
+    footer.about summary {
+      list-style: none; cursor: pointer;
+      padding: 14px 18px; font-size: 14px; font-weight: 600; color: var(--navy);
+      user-select: none;
+    }
+    footer.about summary::-webkit-details-marker { display: none; }
+    footer.about summary::before {
+      content: "▸ "; display: inline-block; margin-right: 4px; transition: transform 150ms ease;
+      color: var(--muted);
+    }
+    footer.about details[open] summary::before { transform: rotate(90deg); }
+    footer.about .about-body {
+      padding: 4px 18px 18px; font-size: 13px; line-height: 1.6; color: #374151;
+    }
+    footer.about .about-body p { margin: 0 0 10px; }
+    footer.about .about-body p:last-child { margin-bottom: 0; }
+    footer.about .about-body a { color: #2563eb; text-decoration: none; }
+    footer.about .about-body a:hover { text-decoration: underline; }
+    footer.about .about-body code { background: #eef0f3; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+
     /* Brief yellow flash when arrived at via a ?p=<id> deep link. */
     @keyframes cardFlash {
       0%   { background: #fef3c7; box-shadow: 0 0 0 3px #fcd34d; }
@@ -250,6 +277,22 @@
 
   <div id="count" class="count"></div>
   <div id="grid" class="grid"></div>
+
+  <footer class="about">
+    <details>
+      <summary>About this tracker</summary>
+      <div class="about-body">
+        <p><strong>Who curates this:</strong> Solo project by Nicholas Heng — former Auburn tennis player (Class of 2026).</p>
+        <p><strong>Update cadence:</strong> Manually maintained. Updates roll in as new transfer announcements happen — usually within a few hours of major news.</p>
+        <p><strong>UTR ratings:</strong> Point-in-time snapshots, not live ratings. The number reflects each player's UTR at the time their card was last updated. UTR data is paywalled, so we don't auto-fetch.</p>
+        <p><strong>ITA rankings:</strong> Year-end 2025–26 (released May 20, 2026). Team rankings come from <code>rankings.js</code> / <code>rankings-w.js</code>; player singles + doubles rankings from <code>singles-m.js</code> / <code>singles-w.js</code> / <code>doubles-m.js</code> / <code>doubles-w.js</code>.</p>
+        <p><strong>Doubles rankings are team-based:</strong> both players on a ranked doubles team get the same rank, and the rank reflects their <em>previous</em> school's pairing.</p>
+        <p><strong>Who's included:</strong> D1 transfers (men's and women's). D2 and JUCO players are included only when they've committed to a D1 school — incoming D1 transfers. Players still "available" at a D2/JUCO program are excluded.</p>
+        <p><strong>News sources:</strong> Primarily <em>College Tennis Nation</em> (@CTennisNation) and <em>Parsa Bombs</em> (@ParsaBombs) on X, plus direct DMs and program releases. If you have a transfer that should be on here, send it over.</p>
+        <p><strong>Corrections, submissions, missing players:</strong> Email <a href="mailto:support@tennistransferportal.com">support@tennistransferportal.com</a>.</p>
+      </div>
+    </details>
+  </footer>
 
   <!-- Rankings + data load first, then the code that displays them -->
   <script src="rankings.js"></script>
