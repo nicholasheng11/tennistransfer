@@ -453,7 +453,7 @@
       const optionList = arr => arr.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>').join("");
       let html = '<option value="all">All</option>';
       if (countries.length) html += '<optgroup label="Countries">' + optionList(countries) + '</optgroup>';
-      if (states.length)    html += '<optgroup label="US States">' + optionList(states) + '</optgroup>';
+      if (states.length)    html += '<optgroup label="States">' + optionList(states) + '</optgroup>';
       countryEl.innerHTML = html;
     })();
 
