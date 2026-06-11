@@ -133,6 +133,7 @@
 
     /* ---- Card: clean border, lift + shadow on hover ------------------- */
     .card {
+      position: relative;
       background: var(--card);
       border: 1px solid #e5e7eb;
       border-radius: 14px;
@@ -143,6 +144,20 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(17, 32, 58, 0.10);
     }
+    /* Brief yellow flash when arrived at via a ?p=<id> deep link. */
+    @keyframes cardFlash {
+      0%   { background: #fef3c7; box-shadow: 0 0 0 3px #fcd34d; }
+      100% { background: var(--card); box-shadow: 0 6px 16px rgba(17, 32, 58, 0.10); }
+    }
+    .card.flash { animation: cardFlash 2.4s ease-out; }
+    /* Share button: small subtle icon in the bottom-right; click copies a deep link. */
+    .share-btn {
+      position: absolute; right: 12px; bottom: 10px;
+      background: transparent; border: none; cursor: pointer;
+      font-size: 14px; line-height: 1; color: #9ca3af; padding: 4px 6px; border-radius: 6px;
+    }
+    .share-btn:hover { color: var(--navy); background: #f3f4f6; }
+    .share-btn.copied { color: var(--accent); }
     .card-top {
       display: flex;
       justify-content: space-between;
@@ -595,13 +610,14 @@
         if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
         const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
         return `
-          <div class="card">
+          <div class="card" data-id="${esc(p.id)}">
             <div class="card-top">
               <div class="name">${esc(p.name)}${inlineRank}</div>
               <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
             </div>
             <div class="schools">${schools}</div>
             ${meta}
+            <button class="share-btn" type="button" title="Copy a link to this card" aria-label="Share">↗</button>
           </div>`;
       }).join("");
     }
@@ -609,6 +625,48 @@
     refreshStats();   // initial header counts
     refreshTopDestinations();   // initial leaderboard line
     render(); // draw everything for the first time
+
+    // Per-card share button — uses event delegation since cards are rebuilt on every render.
+    // Click writes a deep link (e.g. https://tennistransferportal.com/?p=272) to the clipboard.
+    grid.addEventListener("click", e => {
+      const btn = e.target.closest(".share-btn");
+      if (!btn) return;
+      const card = btn.closest("[data-id]");
+      if (!card) return;
+      const url = location.origin + location.pathname + "?p=" + encodeURIComponent(card.dataset.id);
+      const flash = () => {
+        const orig = btn.textContent;
+        btn.textContent = "✓";
+        btn.classList.add("copied");
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove("copied"); }, 1500);
+      };
+      // Try the async clipboard API first; fall back to a hidden textarea + execCommand for older browsers.
+      (navigator.clipboard && navigator.clipboard.writeText
+        ? navigator.clipboard.writeText(url)
+        : new Promise((resolve, reject) => {
+            const ta = document.createElement("textarea");
+            ta.value = url; ta.style.position = "fixed"; ta.style.opacity = "0";
+            document.body.appendChild(ta); ta.select();
+            try { document.execCommand("copy"); resolve(); } catch (err) { reject(err); }
+            finally { document.body.removeChild(ta); }
+          })
+      ).then(flash).catch(() => { window.prompt("Copy this URL:", url); });
+    });
+
+    // Deep-link handler: if the URL has ?p=<id>, scroll that card into view and flash it briefly.
+    (function handleDeepLink() {
+      const params = new URLSearchParams(location.search);
+      const pid = params.get("p");
+      if (!pid) return;
+      // Wait one frame so cards from the initial render() are in the DOM.
+      requestAnimationFrame(() => {
+        const card = grid.querySelector('[data-id="' + CSS.escape(pid) + '"]');
+        if (!card) return;
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        card.classList.add("flash");
+        card.addEventListener("animationend", () => card.classList.remove("flash"), { once: true });
+      });
+    })();
   </script>
 </body>
 </html>
