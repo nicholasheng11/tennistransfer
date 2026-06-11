@@ -194,6 +194,10 @@
         <label for="p4">Schools:</label>
         <select id="p4">
           <option value="all">All schools</option>
+          <option value="p4p4">P4 to P4</option>
+          <option value="p4mid">P4 to Mid-Major</option>
+          <option value="midp4">Mid-Major to P4</option>
+          <option value="midmid">Mid-Major to Mid-Major</option>
           <option value="sec">To SEC</option>
           <option value="bigten">To Big Ten</option>
           <option value="big12">To Big 12</option>
@@ -407,7 +411,15 @@
       }
 
       // 2b. School filter: Power 4 or Mid-Major, by destination ("to") or origin ("from")
-      if (p4Filter === "sec") {
+      if (p4Filter === "p4p4") {
+        players = players.filter(p => isP4(p.previousSchool) && isP4(p.newSchool));
+      } else if (p4Filter === "p4mid") {
+        players = players.filter(p => isP4(p.previousSchool) && isMidMajor(p.newSchool));
+      } else if (p4Filter === "midp4") {
+        players = players.filter(p => isMidMajor(p.previousSchool) && isP4(p.newSchool));
+      } else if (p4Filter === "midmid") {
+        players = players.filter(p => isMidMajor(p.previousSchool) && isMidMajor(p.newSchool));
+      } else if (p4Filter === "sec") {
         players = players.filter(p => SEC.has(p.newSchool));
       } else if (p4Filter === "bigten") {
         players = players.filter(p => BIG_TEN.has(p.newSchool));
