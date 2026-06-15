@@ -63,7 +63,7 @@ const ITA_RANKINGS_M = {
   "Nebraska": 57,
   "Oregon": 58,
   "Loyola Marymount": 59,
-  "South Florida": 60,
+  "USF": 60,
   "Indiana": 61,
   "Louisville": 62,
   "Liberty": 63,
