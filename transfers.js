@@ -264,7 +264,6 @@ const TRANSFERS = [
   { id: "229", gender: "W", name: "Angeles Rodriguez-Rizo", status: "In Portal", previousSchool: "Jacksonville State", newSchool: "", country: "Mexico", utr: "8.33", classYear: "Fr.", dateUpdated: "2026-05-04" },
   { id: "228", gender: "W", name: "Stoney Cooks", status: "Committed", previousSchool: "Texas State", newSchool: "Portland State", country: "New York", utr: "", classYear: "Fr.", dateUpdated: "2026-05-03" },
   { id: "227", gender: "W", name: "Emma Cohen", status: "Committed", previousSchool: "Mississippi State", newSchool: "Louisiana Tech", country: "England", utr: "9.02", classYear: "So.", dateUpdated: "2026-05-03" },
-  { id: "226", gender: "W", name: "Isabella Temenugov", status: "Committed", previousSchool: "Sacramento State", newSchool: "Saint Leo", country: "Czech Republic", utr: "", classYear: "Fr.", dateUpdated: "2026-05-03" },
   { id: "225", gender: "W", name: "Simone Cameron", status: "In Portal", previousSchool: "North Dakota", newSchool: "", country: "Australia", utr: "7.77", classYear: "Fr.", dateUpdated: "2026-05-03" },
   { id: "224", gender: "W", name: "Manal Ennaciri", status: "In Portal", previousSchool: "South Alabama", newSchool: "", country: "Morocco", utr: "9.07", classYear: "", dateUpdated: "2026-05-03" },
   { id: "223", gender: "W", name: "Paulina Villegas", status: "In Portal", previousSchool: "Nicholls State", newSchool: "", country: "Mexico", utr: "8.51", classYear: "So.", dateUpdated: "2026-05-03" },
