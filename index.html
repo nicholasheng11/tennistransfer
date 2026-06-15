@@ -52,6 +52,16 @@
       --share-hover-bg: #f3f4f6;
       --code-bg: #eef0f3;
       --link: #2563eb;
+      /* Header-specific vars — these flip in dark mode so the sticky header inverts.
+         Light: dark-navy bg + white text + white active pills with navy text.
+         Dark : light bg + dark text + dark active pills with white text. */
+      --header-bg: #11203a;
+      --header-text: #ffffff;
+      --header-pill-bg: rgba(255,255,255,0.12);
+      --header-pill-active-bg: #ffffff;
+      --header-pill-active-text: #11203a;
+      --header-toggle-bg: rgba(255,255,255,0.10);
+      --header-toggle-bg-hover: rgba(255,255,255,0.18);
     }
     [data-theme="dark"] {
       --bg: #0f172a;
@@ -65,6 +75,14 @@
       --share-hover-bg: #334155;
       --code-bg: #334155;
       --link: #60a5fa;
+      /* Inverted header in dark mode: light bg + navy text. */
+      --header-bg: #f4f5f7;
+      --header-text: #11203a;
+      --header-pill-bg: rgba(17,32,58,0.08);
+      --header-pill-active-bg: #11203a;
+      --header-pill-active-text: #ffffff;
+      --header-toggle-bg: rgba(17,32,58,0.08);
+      --header-toggle-bg-hover: rgba(17,32,58,0.15);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -78,8 +96,8 @@
 
     /* ---- Sticky header: title, search, filter pills + sort ------------- */
     header {
-      background: var(--navy);
-      color: #fff;
+      background: var(--header-bg);
+      color: var(--header-text);
       padding: 18px 16px 14px;
       position: sticky;
       top: 0;
@@ -88,11 +106,11 @@
     /* Theme toggle pinned in the top-right of the header. */
     .theme-toggle {
       position: absolute; top: 14px; right: 14px;
-      background: rgba(255,255,255,0.10); border: none; color: #fff;
+      background: var(--header-toggle-bg); border: none; color: var(--header-text);
       font-size: 16px; cursor: pointer; padding: 6px 10px; border-radius: 999px;
       line-height: 1;
     }
-    .theme-toggle:hover { background: rgba(255,255,255,0.18); }
+    .theme-toggle:hover { background: var(--header-toggle-bg-hover); }
     header h1 { font-size: 19px; font-weight: 700; }
     header p  { font-size: 13px; opacity: 0.75; margin-top: 2px; }
     header p.stats { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; letter-spacing: 0.2px; }
@@ -134,8 +152,8 @@
     }
     .filter-btn {
       flex: 0 0 auto;
-      background: rgba(255,255,255,0.12);
-      color: #fff;
+      background: var(--header-pill-bg);
+      color: var(--header-text);
       border: none;
       padding: 7px 13px;
       border-radius: 999px;
@@ -143,13 +161,13 @@
       cursor: pointer;
       white-space: nowrap;
     }
-    .filter-btn.active { background: #fff; color: var(--navy); font-weight: 600; }
+    .filter-btn.active { background: var(--header-pill-active-bg); color: var(--header-pill-active-text); font-weight: 600; }
     .pill-count { font-size: 12px; opacity: 0.6; margin-left: 4px; font-weight: 600; }
     /* Gender pills sit on their own row above the status pills. */
     #gender-filters { margin-top: 10px; }
 
     .sortwrap { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; }
-    .sortwrap label { font-size: 13px; color: #fff; opacity: 0.75; }
+    .sortwrap label { font-size: 13px; color: var(--header-text); opacity: 0.75; }
     .sortwrap select {
       font-size: 13px;
       padding: 6px 8px;
