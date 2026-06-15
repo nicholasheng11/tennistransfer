@@ -267,8 +267,138 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
     // Trim trailing qualifiers off a captured school ("Texas A&M as a graduate transfer" -> "Texas A&M").
     function stripQualifier(s) { return (s || "").replace(/\s+(as an?|ahead of|for the|over|after|to play|to join)\b.*$/i, "").trim(); }
 
+    // Country flag emoji → country name. Used to auto-fill country from Parsa Bombs posts like "🇫🇷 Player Name (UTR ...)".
+    // The 🇺🇸 flag is intentionally omitted: US players should have a state, not "USA" — leave blank and the curator fills it.
+    const FLAG_TO_COUNTRY = {
+      "🇦🇷":"Argentina","🇦🇺":"Australia","🇦🇹":"Austria","🇧🇪":"Belgium","🇧🇴":"Bolivia",
+      "🇧🇦":"Bosnia-Herzegovina","🇧🇼":"Botswana","🇧🇷":"Brazil","🇧🇬":"Bulgaria","🇨🇦":"Canada",
+      "🇨🇱":"Chile","🇨🇳":"China","🇨🇴":"Colombia","🇨🇷":"Costa Rica","🇭🇷":"Croatia",
+      "🇨🇾":"Cyprus","🇨🇿":"Czech Republic","🇩🇰":"Denmark","🇪🇨":"Ecuador","🇪🇬":"Egypt",
+      "🇪🇪":"Estonia","🇫🇮":"Finland","🇫🇷":"France","🇩🇪":"Germany","🇬🇷":"Greece",
+      "🇬🇹":"Guatemala","🇭🇺":"Hungary","🇮🇱":"Israel","🇮🇹":"Italy","🇯🇵":"Japan",
+      "🇯🇴":"Jordan","🇰🇿":"Kazakhstan","🇱🇹":"Lithuania","🇲🇾":"Malaysia","🇲🇽":"Mexico",
+      "🇲🇩":"Moldova","🇲🇪":"Montenegro","🇲🇦":"Morocco","🇳🇱":"Netherlands","🇳🇿":"New Zealand",
+      "🇳🇴":"Norway","🇵🇱":"Poland","🇵🇹":"Portugal","🇷🇴":"Romania","🇷🇺":"Russia",
+      "🇷🇸":"Serbia","🇸🇰":"Slovakia","🇸🇮":"Slovenia","🇿🇦":"South Africa","🇰🇷":"South Korea",
+      "🇪🇸":"Spain","🇸🇪":"Sweden","🇨🇭":"Switzerland","🇹🇯":"Tajikistan","🇹🇳":"Tunisia",
+      "🇹🇷":"Turkey","🇺🇦":"Ukraine","🇻🇪":"Venezuela","🇻🇳":"Vietnam"
+    };
+
+    // Twitter handle → school name. Parsa Bombs / CTN posts tag the destination school by handle.
+    // School names here MUST match the strings used in transfers.js / rankings.js so the rank badge renders.
+    const HANDLE_TO_SCHOOL = {
+      // SEC
+      "AggieMTen":"Texas A&M","AggieWTEN":"Texas A&M",
+      "AuburnMTennis":"Auburn","AuburnWTennis":"Auburn",
+      "GatorsMTN":"Florida","GatorsWTN":"Florida",
+      "HailStateMT":"Mississippi State","HailStateWT":"Mississippi State",
+      "TexasWTN":"Texas","TexasMTN":"Texas",
+      "Vol_Tennis":"Tennessee","Vol_wTennis":"Tennessee",
+      "LSUmTen":"LSU","LSUwTen":"LSU",
+      "UofMTennis":"Memphis", // Parsa Bombs disambiguates as Memphis
+      "ArkansasMTennis":"Arkansas","RazorbacksWTennis":"Arkansas",
+      "BamaMTen":"Alabama","BamaWTen":"Alabama",
+      "BulldogsTennis":"Georgia","UGAWTennis":"Georgia",
+      "MissStWTennis":"Mississippi State",
+      "OleMissMTennis":"Ole Miss","OleMissWTennis":"Ole Miss",
+      "GamecockMTen":"South Carolina","GamecockWTen":"South Carolina",
+      "MizzouMTennis":"Missouri","MizzouWTennis":"Missouri",
+      "KentuckyMTen":"Kentucky","KentuckyWTen":"Kentucky",
+      "VandyMTennis":"Vanderbilt","VandyWTennis":"Vanderbilt",
+      // Big 12
+      "OU_MTennis":"Oklahoma","OU_WTennis":"Oklahoma",
+      "CowboyTennis":"Oklahoma State","CowgirlTennis":"Oklahoma State",
+      "TCUMensTennis":"TCU","TCUWomensTennis":"TCU",
+      "TexasTechMTEN":"Texas Tech","TexasTechWTennis":"Texas Tech",
+      "WVUTennis":"West Virginia",
+      "UHCougarTennis":"Houston",
+      "UteMensTennis":"Utah","UteWomensTennis":"Utah",
+      "BaylorMTennis":"Baylor","BaylorWTennis":"Baylor",
+      "BYUMensTennis":"BYU","BYUWomensTennis":"BYU",
+      "CincyTennis":"Cincinnati",
+      "ArizonaMTennis":"Arizona","ArizonaWTennis":"Arizona",
+      "SunDevilMTen":"Arizona State","SunDevilWTen":"Arizona State",
+      "KStateTennis":"Kansas State",
+      "KansasMTennis":"Kansas","KansasWTennis":"Kansas",
+      "UCFMTennis":"UCF","UCFWTennis":"UCF",
+      // Big Ten
+      "MSU_MTennis":"Michigan State","MSU_WTennis":"Michigan State",
+      "UCLAmTennis":"UCLA","UCLAwTennis":"UCLA",
+      "USCmTennis":"USC","USCwTennis":"USC",
+      "HuskerMTennis":"Nebraska","HuskerWTennis":"Nebraska",
+      "IllinoisMTen":"Illinois","IllinoisWTen":"Illinois",
+      "IndianaMTennis":"Indiana","IndianaWTennis":"Indiana",
+      "OhioStMTennis":"Ohio State","OhioStWTennis":"Ohio State",
+      "MichiganMTen":"Michigan","MichiganWTen":"Michigan",
+      "PennStMTennis":"Penn State","PennStWTennis":"Penn State",
+      "PurdueMTennis":"Purdue","PurdueWTennis":"Purdue",
+      "MarylandMTennis":"Maryland","MarylandWTennis":"Maryland",
+      "RutgersTennis":"Rutgers",
+      "NUMensTennis":"Northwestern","NUWomensTennis":"Northwestern",
+      "WisconsinMTen":"Wisconsin","WisconsinWTen":"Wisconsin",
+      "UWMTennis":"Washington","UWWTennis":"Washington",
+      "GoDucksMTen":"Oregon","GoDucksWTen":"Oregon",
+      "IowaTennis":"Iowa",
+      "MinnMTennis":"Minnesota","MinnWTennis":"Minnesota",
+      // ACC
+      "BCwTennis":"Boston College","BCmTennis":"Boston College",
+      "CanesMTennis":"Miami (FL)","CanesWTennis":"Miami (FL)",
+      "ClemsonMTennis":"Clemson","ClemsonWTennis":"Clemson",
+      "GT_MTen":"Georgia Tech","GT_WTen":"Georgia Tech",
+      "HokiesMTennis":"Virginia Tech","HokiesWTennis":"Virginia Tech",
+      "NotreDameMTennis":"Notre Dame","NotreDameWTennis":"Notre Dame",
+      "PackMTennis":"NC State","PackWTennis":"NC State",
+      "SMUmTennis":"SMU","SMUwTennis":"SMU",
+      "UVAmTennis":"Virginia","UVAWomensTennis":"Virginia",
+      "PittMTennis":"Pittsburgh","PittWTennis":"Pittsburgh",
+      "FSUMTennis":"Florida State","FSUWTennis":"Florida State",
+      "WakeMTen":"Wake Forest","WakeWTen":"Wake Forest",
+      "DukeMTennis":"Duke","DukeWTennis":"Duke",
+      "LouisvilleMTen":"Louisville","LouisvilleWTen":"Louisville",
+      "CuseMTennis":"Syracuse","CuseWTennis":"Syracuse",
+      "StanfordMTen":"Stanford","StanfordWTen":"Stanford",
+      "CalMensTennis":"Cal","CalWomensTennis":"Cal",
+      "UNCmTennis":"UNC","UNCwTennis":"UNC",
+      // Mid-Major / common others
+      "CofCMTennis":"College of Charleston","CofCWTennis":"College of Charleston",
+      "CSUNmTennis":"CSUN","CSUNWTennis":"CSUN",
+      "CULionsMTEN":"Columbia","CULionsWTEN":"Columbia",
+      "FAUMTennis":"FAU","FAUWTennis":"FAU",
+      "GoMocsMTen":"Chattanooga","GoMocsWTen":"Chattanooga",
+      "MT_MensTennis":"MTSU","MT_WomensTennis":"MTSU",
+      "TulsaMTennis":"Tulsa","TulsawTennis":"Tulsa","TulsaWTennis":"Tulsa",
+      "Unlv_MensTennis":"UNLV","UNLVwTennis":"UNLV",
+      "UCSBMTennis":"UC Santa Barbara","UCSBWTennis":"UC Santa Barbara",
+      "USDmTennis":"San Diego","USDwTennis":"San Diego",
+      "USFmTen":"South Florida","USFwTen":"South Florida",
+      "UTSAMT":"UTSA","UTSAWT":"UTSA",
+      "ChoctawSports":"Mississippi College",
+      "PepperdineMTen":"Pepperdine","PepperdineWTen":"Pepperdine",
+      "SantaClaraTennis":"Santa Clara",
+      "RiceMTennis":"Rice","RiceWTennis":"Rice",
+      "ODU_WTennis":"Old Dominion","ODU_MTennis":"Old Dominion"
+    };
+
     function detectClassYear(text) {
+      // Strongest signal: explicit "graduate transfer" / "grad transfer" mention
+      if (/\b(grad(?:uate)?\s+transfer|as\s+a\s+grad\b)/i.test(text)) return "Gr.";
+      // Parsa Bombs "After/Following N seasons at X[ and M seasons at Y]" — sum the seasons.
+      // (Semesters intentionally NOT counted — too ambiguous; map to class year later if needed.)
+      if (/^(?:After|Following)\b/i.test(text)) {
+        const matches = [...text.matchAll(/\b(\d+)\s+seasons?\b/gi)];
+        if (matches.length > 0) {
+          const total = matches.reduce((acc, m) => acc + parseInt(m[1], 10), 0);
+          if (total === 1) return "Fr.";
+          if (total === 2) return "So.";
+          if (total === 3) return "Jr.";
+          if (total >= 4) return "Sr.";
+        }
+      }
       if (/\bgraduate\b/i.test(text)) return "Gr.";
+      if (/\bfreshman\b/i.test(text)) return "Fr.";
+      if (/\bsophomore\b/i.test(text)) return "So.";
+      if (/\bjunior\b/i.test(text)) return "Jr.";
+      if (/\bsenior\b/i.test(text)) return "Sr.";
       const m = text.match(/\b(R-?Sr|R-?Jr|Sr|Jr|So|Fr)\b\.?/i);
       if (!m) return "";
       const key = m[1].toUpperCase().replace(/-/g, "");
@@ -281,9 +411,23 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       return m ? m[1] : "";
     }
 
-    // Best-effort country: grab the location after "from" or before "native", then reduce
-    // "City, X" to X (matches the schema rule). Heuristic — fix the field before generating.
+    // Detect a country flag emoji and map it to a country name. Used for Parsa Bombs format.
+    function detectFlag(text) {
+      // Regional indicator letters (U+1F1E6 - U+1F1FF) — flag emoji is a pair of them.
+      const m = text.match(/[\u{1F1E6}-\u{1F1FF}]{2}/u);
+      return m ? (FLAG_TO_COUNTRY[m[0]] || "") : "";
+    }
+
+    // Detect destination school from a Twitter handle (@SchoolHandle) in the text.
+    function detectHandle(text) {
+      const m = text.match(/@([A-Za-z0-9_]+)/);
+      return m ? (HANDLE_TO_SCHOOL[m[1]] || "") : "";
+    }
+
+    // Best-effort country: flag emoji first (Parsa Bombs), then "from X" / "The X native" (CTN heuristic).
     function detectCountry(text) {
+      const flag = detectFlag(text);
+      if (flag) return flag;
       let m = text.match(/\bfrom\s+([A-Z][A-Za-z.'\- ]+(?:,\s*[A-Za-z.'\- ]+){0,2})/);
       if (!m) m = text.match(/\bThe\s+([A-Z][A-Za-z.'\- ]+(?:,\s*[A-Za-z.'\- ]+){0,2})\s+native\b/);
       if (!m) return "";
@@ -293,12 +437,36 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
       return loc;
     }
 
+    // Parsa Bombs format: "After/Following N seasons at SchoolA[ and M seasons at SchoolB], [FLAG] Name (UTR ...) is transferring and has signed with @HandleName for fall of 2026..."
+    // The UTR has already been stripped from `t` by the time this runs.
+    function parseParsaBombs(t, res) {
+      const prefix = t.match(/^(?:After|Following)\s+([^,]+?),\s+(.+?)\s+is\s+transferring\b/i);
+      if (!prefix) return false;
+      // Pull each school out of the prefix. Handles 1-3 schools chained with " and N seasons at ".
+      const schools = [];
+      const schoolRe = /\d+\s+(?:season|semester)s?\s+at\s+(.+?)(?=\s+(?:and|&)\s+\d+\s+(?:season|semester)s?\s+at\b|$)/gi;
+      let sm;
+      while ((sm = schoolRe.exec(prefix[1])) !== null) schools.push(sm[1].trim());
+      if (schools.length === 0) return false;
+      res.previousSchool = schools.join(", ");
+      // Group 2 is "[🇫🇷 ]Name Name" — strip leading flag emojis and whitespace.
+      let nameText = prefix[2].replace(/^[\s\u{1F1E6}-\u{1F1FF}]+/u, "").trim();
+      // Just in case anything weird trails (e.g., a stray parenthetical), strip.
+      nameText = nameText.replace(/\s*\([^)]*\)\s*$/, "").trim();
+      res.name = clean(nameText);
+      res.status = "Committed";
+      res.newSchool = detectHandle(t);
+      return true;
+    }
+
     function parseTweet(raw) {
       const res = { name: "", previousSchool: "", newSchool: "", status: "", classYear: "", utr: "", country: "" };
       if (!raw) return res;
       // normalize curly quotes + whitespace, strip leading emojis and "BREAKING:" style labels
       let t = raw.replace(/[‘’‛′]/g, "'").replace(/[“”″]/g, '"').replace(/\s+/g, " ").trim();
-      t = t.replace(/^[^A-Za-z"']+/, "");
+      // Skip leading emojis ONLY if they're not the country-flag pair we may need for detectFlag.
+      // Strip leading non-letter chars except flag emoji pairs.
+      t = t.replace(/^(?![\u{1F1E6}-\u{1F1FF}])[^A-Za-z"']+/u, "");
       t = t.replace(/^(BREAKING|NEWS|PORTAL ALERT|TRANSFER PORTAL NEWS|TRANSFER NEWS)\s*[:\-]?\s*/i, "");
 
       res.classYear = detectClassYear(t);
@@ -309,6 +477,10 @@ Diego Costa, Texas, TCU, S, Gr."></textarea>
            .replace(/\bUTR\s*\d{1,2}\.\d{1,2}\b/gi, " ")
            .replace(/\s+/g, " ").trim();
       res.country = detectCountry(t);
+
+      // Try Parsa Bombs format first — it's more specific than the CTN patterns and the schools
+      // can't be inferred from the CTN regexes.
+      if (parseParsaBombs(t, res)) return res;
 
       let m;
       // Name (School) has entered the [transfer] portal
