@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lint — Tennis Transfer Tracker</title>
+  <style>
+    :root {
+      --navy: #11203a; --bg: #f4f5f7; --card: #ffffff; --text: #1a1d23;
+      --muted: #6b7280; --border: #e5e7eb;
+      --err: #b91c1c; --err-bg: #fee2e2;
+      --warn: #92400e; --warn-bg: #fef3c7;
+      --ok: #065f46; --ok-bg: #d1fae5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 0 0 60px; }
+    header { background: var(--navy); color: #fff; padding: 18px 20px; }
+    header h1 { font-size: 20px; font-weight: 700; }
+    header p  { font-size: 13px; opacity: 0.75; margin-top: 4px; }
+    main { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+
+    .summary { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; }
+    .summary strong { font-size: 14px; }
+    .summary span { display: inline-block; margin-right: 14px; font-size: 13px; }
+    .summary .err-count { color: var(--err); }
+    .summary .warn-count { color: var(--warn); }
+    .summary .ok-count { color: var(--ok); }
+
+    section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 16px; padding: 0; }
+    section h2 { font-size: 14px; font-weight: 700; padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    section h2 .pill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+    section h2 .pill.err  { background: var(--err-bg);  color: var(--err); }
+    section h2 .pill.warn { background: var(--warn-bg); color: var(--warn); }
+    section h2 .pill.ok   { background: var(--ok-bg);   color: var(--ok); }
+    section .desc { padding: 8px 18px; font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--border); }
+    section ul { list-style: none; padding: 6px 0; }
+    section li { padding: 6px 18px; font-size: 13px; border-bottom: 1px solid #f3f4f6; }
+    section li:last-child { border-bottom: none; }
+    section li code { background: #eef0f3; padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+    section .empty { padding: 14px 18px; font-size: 13px; color: var(--ok); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧹 Lint — transfers.js</h1>
+    <p>Standalone data-quality checks. Not linked from the live site — open this file directly.</p>
+  </header>
+  <main id="report">Loading…</main>
+
+  <!-- Same data sources as the main site. -->
+  <script src="rankings.js"></script>
+  <script src="rankings-w.js"></script>
+  <script src="singles-m.js"></script>
+  <script src="singles-w.js"></script>
+  <script src="doubles-m.js"></script>
+  <script src="doubles-w.js"></script>
+  <script src="transfers.js"></script>
+  <script>
+    const report = document.getElementById("report");
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+    // Group all the checks. Each returns { items: [...], desc: "..." } and a severity label.
+    const checks = [];
+
+    function addCheck(title, severity, desc, items) {
+      checks.push({ title, severity, desc, items });
+    }
+
+    // ---- Check: duplicate ids ---------------------------------------
+    {
+      const seen = {};
+      TRANSFERS.forEach(p => { seen[p.id] = (seen[p.id] || []); seen[p.id].push(p); });
+      const dups = Object.entries(seen).filter(([id, arr]) => arr.length > 1);
+      const items = dups.map(([id, arr]) =>
+        `id <code>${esc(id)}</code> used by ${arr.length} entries: ${arr.map(p => esc(p.name)).join(", ")}`);
+      addCheck("Duplicate IDs", "err",
+        "Every player must have a unique id. Duplicates mean the share-link feature collides and updates may target the wrong row.", items);
+    }
+
+    // ---- Check: duplicate names (case-insensitive) -------------------
+    {
+      const seen = {};
+      TRANSFERS.forEach(p => {
+        const k = String(p.name).trim().toLowerCase();
+        seen[k] = (seen[k] || []); seen[k].push(p);
+      });
+      const dups = Object.entries(seen).filter(([_, arr]) => arr.length > 1);
+      const items = dups.map(([name, arr]) =>
+        `"${esc(arr[0].name)}" appears ${arr.length}× (ids: ${arr.map(p => p.id).join(", ")})`);
+      addCheck("Duplicate names", "err",
+        "Same-named players are usually a stale duplicate. Per the update-over-duplicate rule, the newer post should UPDATE the existing entry, not add a second row.", items);
+    }
+
+    // ---- Check: Committed but no newSchool --------------------------
+    {
+      const bad = TRANSFERS.filter(p => p.status === "Committed" && (!p.newSchool || !p.newSchool.trim()));
+      const items = bad.map(p => `id ${p.id} — <strong>${esc(p.name)}</strong> is Committed but newSchool is empty.`);
+      addCheck("Committed without destination", "err",
+        "A Committed player must have a newSchool. Either they're actually In Portal, or the newSchool got dropped.", items);
+    }
+
+    // ---- Check: In Portal but has newSchool --------------------------
+    {
+      const bad = TRANSFERS.filter(p => p.status === "In Portal" && p.newSchool && p.newSchool.trim());
+      const items = bad.map(p => `id ${p.id} — <strong>${esc(p.name)}</strong> is In Portal but newSchool="${esc(p.newSchool)}".`);
+      addCheck("In Portal with destination set", "err",
+        "An In Portal player shouldn't have a newSchool. Either the status should flip to Committed, or the newSchool should be cleared.", items);
+    }
+
+    // ---- Check: missing country -------------------------------------
+    {
+      const bad = TRANSFERS.filter(p => !p.country || !p.country.trim());
+      const items = bad.map(p => `id ${p.id} — <strong>${esc(p.name)}</strong> (${esc(p.previousSchool || "?")} → ${esc(p.newSchool || "?")})`);
+      addCheck("Missing country", "warn",
+        "Country (or US state) is blank. Cards still render fine but the country line is hidden.", items);
+    }
+
+    // ---- Check: missing UTR -----------------------------------------
+    {
+      const bad = TRANSFERS.filter(p => !p.utr || !String(p.utr).trim());
+      const items = bad.map(p => `id ${p.id} — <strong>${esc(p.name)}</strong> (${esc(p.previousSchool || "?")} → ${esc(p.newSchool || "?")})`);
+      addCheck("Missing UTR", "warn",
+        "UTR is blank. Card still renders without the UTR line. Fill in when you have one.", items);
+    }
+
+    // ---- Check: in portal for >30 days ------------------------------
+    {
+      const today = new Date();
+      const bad = [];
+      TRANSFERS.forEach(p => {
+        if (p.status !== "In Portal" || !p.dateUpdated) return;
+        const d = String(p.dateUpdated).split("T")[0].split("-");
+        const t = new Date(Number(d[0]), Number(d[1]) - 1, Number(d[2]));
+        const days = Math.round((today - t) / 86400000);
+        if (days >= 30) bad.push({ p, days });
+      });
+      const items = bad
+        .sort((a, b) => b.days - a.days)
+        .map(({ p, days }) => `id ${p.id} — <strong>${esc(p.name)}</strong> (${esc(p.previousSchool)}): ${days} days in portal`);
+      addCheck("Stale In Portal entries (30+ days)", "warn",
+        "These players have been In Portal without an update for over a month. Often they've committed silently — worth a manual check.", items);
+    }
+
+    // ---- Check: newSchool not in any ranking file (typo radar) ------
+    {
+      // Build a union of every school we know about: POWER4 doesn't live here, but the rankings sets cover all "ranked" schools.
+      // We also accept anything that appears as a previousSchool elsewhere (since portal entries don't have newSchool).
+      const knownSchools = new Set();
+      Object.keys(ITA_RANKINGS_M).forEach(s => knownSchools.add(s));
+      Object.keys(ITA_RANKINGS_W).forEach(s => knownSchools.add(s));
+      TRANSFERS.forEach(p => {
+        if (p.previousSchool) p.previousSchool.split(",").forEach(s => knownSchools.add(s.trim()));
+        if (p.newSchool) knownSchools.add(p.newSchool.trim());
+      });
+      // We expect every newSchool to appear in OTHER players' fields too. A school appearing only once total might be a typo.
+      const counts = {};
+      TRANSFERS.forEach(p => {
+        if (p.newSchool) counts[p.newSchool] = (counts[p.newSchool] || 0) + 1;
+        if (p.previousSchool) p.previousSchool.split(",").forEach(s => {
+          const t = s.trim();
+          counts[t] = (counts[t] || 0) + 1;
+        });
+      });
+      const bad = TRANSFERS.filter(p => p.newSchool && counts[p.newSchool] === 1 && !ITA_RANKINGS_M[p.newSchool] && !ITA_RANKINGS_W[p.newSchool]);
+      const items = bad.map(p => `id ${p.id} — <strong>${esc(p.name)}</strong> → "${esc(p.newSchool)}" (only appearance in the whole file)`);
+      addCheck("Possible typo in newSchool", "warn",
+        "These destination schools appear nowhere else in the data and aren't in either ranking table. Might be a typo, or just a school that hasn't shown up before.", items);
+    }
+
+    // ---- Render the report ------------------------------------------
+    const errCount  = checks.filter(c => c.severity === "err"  && c.items.length).length;
+    const warnCount = checks.filter(c => c.severity === "warn" && c.items.length).length;
+    const okCount   = checks.filter(c => c.items.length === 0).length;
+
+    let html = '<div class="summary"><strong>Summary:</strong> ' +
+      '<span class="err-count">' + errCount + ' check' + (errCount === 1 ? '' : 's') + ' with errors</span>' +
+      '<span class="warn-count">' + warnCount + ' with warnings</span>' +
+      '<span class="ok-count">' + okCount + ' clean</span>' +
+      '<span style="opacity:0.6">scanned ' + TRANSFERS.length + ' players</span>' +
+      '</div>';
+
+    for (const c of checks) {
+      const pillClass = c.items.length === 0 ? "ok" : c.severity;
+      const pillText  = c.items.length === 0 ? "OK" : (c.items.length + " " + (c.severity === "err" ? "error" : "warning") + (c.items.length === 1 ? "" : "s"));
+      html += '<section><h2>' + esc(c.title) + ' <span class="pill ' + pillClass + '">' + pillText + '</span></h2>';
+      html += '<div class="desc">' + esc(c.desc) + '</div>';
+      if (c.items.length === 0) {
+        html += '<div class="empty">All good — no issues found.</div>';
+      } else {
+        html += '<ul>' + c.items.map(it => '<li>' + it + '</li>').join('') + '</ul>';
+      }
+      html += '</section>';
+    }
+
+    report.innerHTML = html;
+  </script>
+</body>
+</html>
