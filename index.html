@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#11203a" />
   <title>D1 Tennis Transfer Tracker</title>
+  <!-- Apply saved/preferred theme BEFORE the stylesheet so we don't flash the wrong colors on load. -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var auto = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", saved || auto);
+      } catch (e) { /* localStorage blocked — default light */ }
+    })();
+  </script>
   <meta name="description" content="Live tracker of D1 men's and women's tennis transfer portal entries and commitments. Filter by conference, ranking, and UTR." />
 
   <link rel="icon" type="image/svg+xml" href="icon.svg" />
@@ -27,6 +37,7 @@
 
   <style>
     /* ---- Colors & basics ---------------------------------------------- */
+    /* Light theme defaults — the [data-theme="dark"] block below overrides these. */
     :root {
       --navy: #11203a;
       --bg: #f4f5f7;
@@ -35,6 +46,25 @@
       --muted: #6b7280;
       --border: #e5e7eb;
       --accent: #16a34a;
+      --select-bg: #ffffff;
+      --select-text: #1a1d23;
+      --card-hover-shadow: rgba(17, 32, 58, 0.10);
+      --share-hover-bg: #f3f4f6;
+      --code-bg: #eef0f3;
+      --link: #2563eb;
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --border: #334155;
+      --select-bg: #1e293b;
+      --select-text: #e5e7eb;
+      --card-hover-shadow: rgba(0, 0, 0, 0.45);
+      --share-hover-bg: #334155;
+      --code-bg: #334155;
+      --link: #60a5fa;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -55,6 +85,14 @@
       top: 0;
       z-index: 10;
     }
+    /* Theme toggle pinned in the top-right of the header. */
+    .theme-toggle {
+      position: absolute; top: 14px; right: 14px;
+      background: rgba(255,255,255,0.10); border: none; color: #fff;
+      font-size: 16px; cursor: pointer; padding: 6px 10px; border-radius: 999px;
+      line-height: 1;
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,0.18); }
     header h1 { font-size: 19px; font-weight: 700; }
     header p  { font-size: 13px; opacity: 0.75; margin-top: 2px; }
     header p.stats { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; letter-spacing: 0.2px; }
@@ -75,6 +113,7 @@
       border: none;
       border-radius: 10px;
       font-size: 15px;
+      background: var(--select-bg); color: var(--select-text);
     }
 
     /* filter pills (scrollable) on the left, sort dropdown on the right */
@@ -116,7 +155,7 @@
       padding: 6px 8px;
       border: none;
       border-radius: 8px;
-      background: #fff;
+      background: var(--select-bg); color: var(--select-text);
       color: var(--text);
       cursor: pointer;
     }
@@ -142,18 +181,18 @@
     }
     .card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(17, 32, 58, 0.10);
+      box-shadow: 0 6px 16px var(--card-hover-shadow);
     }
     /* Footer "About this tracker" expandable panel. Uses native <details>/<summary>. */
     footer.about {
       max-width: 1200px; margin: 24px auto 60px; padding: 0 16px;
     }
     footer.about details {
-      background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 0;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0;
     }
     footer.about summary {
       list-style: none; cursor: pointer;
-      padding: 14px 18px; font-size: 14px; font-weight: 600; color: var(--navy);
+      padding: 14px 18px; font-size: 14px; font-weight: 600; color: var(--text);
       user-select: none;
     }
     footer.about summary::-webkit-details-marker { display: none; }
@@ -163,18 +202,18 @@
     }
     footer.about details[open] summary::before { transform: rotate(90deg); }
     footer.about .about-body {
-      padding: 4px 18px 18px; font-size: 13px; line-height: 1.6; color: #374151;
+      padding: 4px 18px 18px; font-size: 13px; line-height: 1.6; color: var(--text); opacity: 0.85;
     }
     footer.about .about-body p { margin: 0 0 10px; }
     footer.about .about-body p:last-child { margin-bottom: 0; }
-    footer.about .about-body a { color: #2563eb; text-decoration: none; }
+    footer.about .about-body a { color: var(--link); text-decoration: none; }
     footer.about .about-body a:hover { text-decoration: underline; }
-    footer.about .about-body code { background: #eef0f3; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
+    footer.about .about-body code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; }
 
     /* Brief yellow flash when arrived at via a ?p=<id> deep link. */
     @keyframes cardFlash {
       0%   { background: #fef3c7; box-shadow: 0 0 0 3px #fcd34d; }
-      100% { background: var(--card); box-shadow: 0 6px 16px rgba(17, 32, 58, 0.10); }
+      100% { background: var(--card); box-shadow: 0 6px 16px var(--card-hover-shadow); }
     }
     .card.flash { animation: cardFlash 2.4s ease-out; }
     /* Share button: small subtle icon in the bottom-right; click copies a deep link. */
@@ -183,7 +222,7 @@
       background: transparent; border: none; cursor: pointer;
       font-size: 14px; line-height: 1; color: #9ca3af; padding: 4px 6px; border-radius: 6px;
     }
-    .share-btn:hover { color: var(--navy); background: #f3f4f6; }
+    .share-btn:hover { color: var(--text); background: var(--share-hover-bg); }
     .share-btn.copied { color: var(--accent); }
     .card-top {
       display: flex;
@@ -230,6 +269,7 @@
 
 <body>
   <header>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
     <h1>🎾 D1 Tennis Transfer Tracker</h1>
     <p id="stats" class="stats"></p>
     <p id="top-destinations" class="top-dest"></p>
@@ -324,6 +364,21 @@
     const sortEl = document.getElementById("sort");
     const p4El = document.getElementById("p4");
     const countryEl = document.getElementById("country");
+
+    // Theme toggle — the initial data-theme was already set by the inline script in <head>.
+    // This just wires the button to flip it and persists the choice in localStorage.
+    const themeToggle = document.getElementById("theme-toggle");
+    function syncThemeIcon() {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      themeToggle.textContent = isDark ? "☀️" : "🌙";
+    }
+    syncThemeIcon();
+    themeToggle.onclick = () => {
+      const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      try { localStorage.setItem("theme", next); } catch (e) { /* private mode */ }
+      syncThemeIcon();
+    };
     const subtitleEl = document.getElementById("subtitle");
 
     // Power 4 conference members (ACC, SEC, Big Ten, Big 12) — drives the "Schools" filter.
