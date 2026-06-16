@@ -219,7 +219,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 12px;
       padding: 12px 16px 40px;
     }
@@ -228,13 +228,14 @@
     .card {
       position: relative;
       display: grid;
-      grid-template-columns: 50px 1fr;
+      grid-template-columns: 72px 1fr;
       gap: 12px;
       background: var(--card);
       border: 1px solid #e5e7eb;
       border-radius: 14px;
       padding: 14px 16px;
       transition: transform 150ms ease, box-shadow 150ms ease;
+      overflow: hidden;  /* safety net so an overlong rank/school can never bleed past the card border */
     }
     .card-left { display: flex; flex-direction: column; align-items: center; }
     .card-content { min-width: 0; } /* allow long names/schools to wrap inside the grid cell */
@@ -242,7 +243,7 @@
        Color is derived from the player's name so each card is visually distinct. */
     .avatar {
       position: relative;
-      width: 44px; height: 44px;
+      width: 64px; height: 64px;
       border-radius: 50%;
       background: hsl(var(--avatar-h, 200), 55%, 58%);
       color: #fff;
@@ -252,7 +253,7 @@
     .avatar-initials {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 15px; font-weight: 700; letter-spacing: 0.3px;
+      font-size: 22px; font-weight: 700; letter-spacing: 0.3px;
     }
     .avatar img {
       position: relative; z-index: 1;   /* sits ON TOP of initials when loaded */
@@ -298,7 +299,7 @@
     /* Action buttons (☆ watch · 𝕏 tweet · ↗ share) — row sits under the avatar in the left column. */
     .card-actions {
       display: flex; justify-content: space-between; align-items: center;
-      width: 50px; margin-top: 6px;
+      width: 64px; margin-top: 8px;
     }
     .share-btn, .tweet-btn, .watch-btn {
       background: transparent; border: none; cursor: pointer;
@@ -364,13 +365,13 @@
       /* Hide leaderboard + conference summary on phones unless user expanded details. */
       .collapsible { display: none; }
       .collapsible.expanded { display: block; }
-      /* Tighter cards on phones — smaller avatar, less padding, smaller text. */
-      .card { grid-template-columns: 42px 1fr; gap: 10px; padding: 10px 12px; border-radius: 12px; }
-      .avatar { width: 36px; height: 36px; }
-      .avatar-initials { font-size: 13px; }
-      .card-actions { width: 42px; margin-top: 4px; }
+      /* Tighter cards on phones — slightly smaller avatar, less padding, smaller text. */
+      .card { grid-template-columns: 58px 1fr; gap: 10px; padding: 10px 12px; border-radius: 12px; }
+      .avatar { width: 50px; height: 50px; }
+      .avatar-initials { font-size: 17px; }
+      .card-actions { width: 50px; margin-top: 6px; }
       .share-btn, .tweet-btn { font-size: 11px; padding: 1px 3px; }
-      .watch-btn { font-size: 12px; padding: 1px 3px; }
+      .watch-btn { font-size: 13px; padding: 1px 3px; }
       .name { font-size: 15px; }
       .schools { margin-top: 6px; font-size: 14px; }
       .meta { margin-top: 6px; font-size: 11px; }
@@ -386,7 +387,7 @@
     .year { font-size: 13px; font-weight: 500; color: var(--muted); }
 
     /* school transfer line is the visual focus: bold names, light arrow */
-    .schools { margin-top: 8px; font-size: 15px; font-weight: 600; color: var(--text); }
+    .schools { margin-top: 8px; font-size: 15px; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
     .arrow { color: #9ca3af; font-weight: 400; padding: 0 6px; }
     .rank { font-size: 0.85em; color: #6b7280; font-weight: 500; margin-left: 4px; }
     /* Clickable school name → filter by that exact school. */
