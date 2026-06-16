@@ -248,6 +248,21 @@
     .schools { margin-top: 8px; font-size: 15px; font-weight: 600; color: var(--text); }
     .arrow { color: #9ca3af; font-weight: 400; padding: 0 6px; }
     .rank { font-size: 0.85em; color: #6b7280; font-weight: 500; margin-left: 4px; }
+    /* Clickable school name → filter by that exact school. */
+    .school-link { cursor: pointer; }
+    .school-link:hover { text-decoration: underline; color: var(--accent); }
+    /* Chip showing the active school filter, sits below the search box. */
+    .active-school {
+      display: none; align-items: center; gap: 6px; margin-top: 10px;
+      background: rgba(255,255,255,0.15); color: #fff;
+      padding: 4px 10px 4px 12px; border-radius: 999px;
+      font-size: 13px; font-weight: 500; width: fit-content;
+    }
+    .active-school.on { display: inline-flex; }
+    .active-school button {
+      background: none; border: none; color: inherit; cursor: pointer; padding: 0 0 0 2px;
+      font-size: 16px; line-height: 1;
+    }
 
     .meta { margin-top: 8px; font-size: 12px; color: #6b7280; }
     .updated { cursor: help; }
@@ -287,6 +302,7 @@
     <p id="conference-summary" class="top-dest"></p>
     <p id="subtitle"></p>
     <input id="search" class="search" type="text" placeholder="Search player or school..." />
+    <div id="active-school" class="active-school"></div>
     <div id="gender-filters" class="filters"></div>
     <div class="controls">
       <div id="filters" class="filters"></div>
@@ -365,6 +381,7 @@
     let sortBy = "newest";
     let p4Filter = "all";
     let countryFilter = "all";
+    let schoolFilter = ""; // exact-match school filter, set by clicking a school name on a card
 
     // Page elements we'll be updating.
     const grid = document.getElementById("grid");
@@ -375,6 +392,21 @@
     const sortEl = document.getElementById("sort");
     const p4El = document.getElementById("p4");
     const countryEl = document.getElementById("country");
+    const activeSchoolEl = document.getElementById("active-school");
+
+    // Set/clear the exact-match school filter (triggered by clicking a school name on any card).
+    function setSchoolFilter(school) {
+      schoolFilter = school || "";
+      if (schoolFilter) {
+        activeSchoolEl.innerHTML = 'School: <strong>' + esc(schoolFilter) + '</strong> <button title="Clear" aria-label="Clear school filter">&times;</button>';
+        activeSchoolEl.classList.add("on");
+        activeSchoolEl.querySelector("button").onclick = () => setSchoolFilter("");
+      } else {
+        activeSchoolEl.classList.remove("on");
+        activeSchoolEl.innerHTML = "";
+      }
+      render();
+    }
 
     // Theme toggle — the initial data-theme was already set by the inline script in <head>.
     // This just wires the button to flip it and persists the choice in localStorage.
@@ -632,6 +664,15 @@
         players = players.filter(p => p.country === countryFilter);
       }
 
+      // 2b. filter by exact-school (set by clicking a school name on a card).
+      // Matches if the school appears as the newSchool OR as any segment of a comma-separated previousSchool.
+      if (schoolFilter) {
+        players = players.filter(p => {
+          if (p.newSchool === schoolFilter) return true;
+          return p.previousSchool.split(",").some(s => s.trim() === schoolFilter);
+        });
+      }
+
       // 2b. School filter: Power 4 or Mid-Major, by destination ("to") or origin ("from")
       if (p4Filter === "p4p4") {
         players = players.filter(p => isP4(p.previousSchool) && isP4(p.newSchool));
@@ -724,15 +765,20 @@
       grid.innerHTML = players.map(p => {
         const newRank = rankOf(p.newSchool, p.gender);
         const newRankTag = (newRank != null) ? '<span class="rank">#' + newRank + '</span>' : '';
+        const newSchoolLink = p.newSchool
+          ? '<span class="school-link" data-school="' + esc(p.newSchool) + '">' + esc(p.newSchool) + '</span>' + newRankTag
+          : '';
         // Previous-school rank — for multi-school strings like "Pepperdine, South Carolina",
-        // look up each segment so each ranked stop shows its own #X badge.
+        // look up each segment so each ranked stop shows its own #X badge. Each segment is also
+        // wrapped in a `.school-link` span so clicking it triggers an exact-school filter.
         const prev = p.previousSchool.split(",").map(seg => {
           const s = seg.trim();
           const r = rankOf(s, p.gender);
-          return esc(s) + (r != null ? '<span class="rank">#' + r + '</span>' : '');
+          return '<span class="school-link" data-school="' + esc(s) + '">' + esc(s) + '</span>' +
+                 (r != null ? '<span class="rank">#' + r + '</span>' : '');
         }).join(", ");
         const schools = p.newSchool
-          ? prev + '<span class="arrow">&rarr;</span>' + esc(p.newSchool) + newRankTag
+          ? prev + '<span class="arrow">&rarr;</span>' + newSchoolLink
           : prev;
         // Singles + Doubles rankings go inline next to the name (where class year used to be).
         // Class year is kept in the data but no longer shown on cards.
@@ -764,9 +810,15 @@
     refreshConferenceSummary(); // initial conference breakdown
     render(); // draw everything for the first time
 
-    // Per-card share button — uses event delegation since cards are rebuilt on every render.
-    // Click writes a deep link (e.g. https://tennistransferportal.com/?p=272) to the clipboard.
+    // Card click delegation: handles both ↗ share button and clickable school names.
     grid.addEventListener("click", e => {
+      // School-name click → set the exact-school filter and re-render.
+      const schoolLink = e.target.closest(".school-link");
+      if (schoolLink) {
+        setSchoolFilter(schoolLink.dataset.school);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
       const btn = e.target.closest(".share-btn");
       if (!btn) return;
       const card = btn.closest("[data-id]");
