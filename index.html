@@ -240,6 +240,12 @@
     .share-btn.copied { color: var(--accent); }
     .watch-btn.on, .watch-btn.on:hover { color: #f59e0b; }
 
+    /* Editorial "🔥 Featured" row — only visible when at least one player has `featured: true` for the active gender. */
+    .featured { display: none; max-width: 1200px; margin: 16px auto 0; padding: 0 16px; }
+    .featured.on { display: block; }
+    .featured-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); letter-spacing: 0.3px; }
+    .featured-grid { padding: 0; }
+
     /* "NEW" pill that appears next to a player's name if the entry was added/updated since the user's last visit. */
     .new-pill {
       display: inline-block; background: #fbbf24; color: #78350f;
@@ -353,6 +359,7 @@
     </div>
   </header>
 
+  <section id="featured" class="featured"></section>
   <div id="count" class="count"></div>
   <div id="grid" class="grid"></div>
 
@@ -636,6 +643,7 @@
         refreshTopDestinations();
         refreshConferenceSummary();
         refreshWatchPill();
+        renderFeatured();
         render();
       };
       genderFiltersEl.appendChild(btn);
@@ -720,6 +728,12 @@
       // 2c. watchlist filter — when My List pill is active, only show favorited players.
       if (watchlistMode) {
         players = players.filter(p => watchlist.has(p.id));
+      }
+
+      // 2d. Featured players already render in their own row above; exclude them from the main grid
+      // unless we're in watchlist mode (where the user explicitly asked for a specific subset).
+      if (!watchlistMode) {
+        players = players.filter(p => !p.featured);
       }
 
       // 2b. School filter: Power 4 or Mid-Major, by destination ("to") or origin ("from")
@@ -811,58 +825,73 @@
         return;
       }
 
-      grid.innerHTML = players.map(p => {
-        const newRank = rankOf(p.newSchool, p.gender);
-        const newRankTag = (newRank != null) ? '<span class="rank">#' + newRank + '</span>' : '';
-        const newSchoolLink = p.newSchool
-          ? '<span class="school-link" data-school="' + esc(p.newSchool) + '">' + esc(p.newSchool) + '</span>' + newRankTag
-          : '';
-        // Previous-school rank — for multi-school strings like "Pepperdine, South Carolina",
-        // look up each segment so each ranked stop shows its own #X badge. Each segment is also
-        // wrapped in a `.school-link` span so clicking it triggers an exact-school filter.
-        const prev = p.previousSchool.split(",").map(seg => {
-          const s = seg.trim();
-          const r = rankOf(s, p.gender);
-          return '<span class="school-link" data-school="' + esc(s) + '">' + esc(s) + '</span>' +
-                 (r != null ? '<span class="rank">#' + r + '</span>' : '');
-        }).join(", ");
-        const schools = p.newSchool
-          ? prev + '<span class="arrow">&rarr;</span>' + newSchoolLink
-          : prev;
-        // Singles + Doubles rankings go inline next to the name (where class year used to be).
-        // Class year is kept in the data but no longer shown on cards.
-        const singlesRank = singlesRankOf(p.name, p.gender);
-        const doublesRank = doublesRankOf(p.name, p.gender);
-        let inlineRank = "";
-        if (singlesRank != null) inlineRank += ' <span class="year" title="ITA Singles #' + singlesRank + ' as of 2026-05-20">&middot; Singles #' + singlesRank + '</span>';
-        if (doublesRank != null) inlineRank += ' <span class="year" title="ITA Doubles #' + doublesRank + ' as of 2026-05-20">&middot; Doubles #' + doublesRank + '</span>';
-        // Bottom meta line: country and/or UTR. Hidden entirely if both empty.
-        const metaParts = [];
-        if (p.country) metaParts.push(esc(p.country));
-        if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
-        const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
-        const starOn = watchlist.has(p.id) ? "on" : "";
-        const starGlyph = watchlist.has(p.id) ? "★" : "☆";
-        const newBadge = isNew(p.dateUpdated) ? '<span class="new-pill">NEW</span>' : '';
-        return `
-          <div class="card" data-id="${esc(p.id)}">
-            <div class="card-top">
-              <div class="name">${esc(p.name)}${newBadge}${inlineRank}</div>
-              <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
-            </div>
-            <div class="schools">${schools}</div>
-            ${meta}
-            <button class="watch-btn ${starOn}" type="button" title="Add to / remove from your watchlist" aria-label="Watchlist">${starGlyph}</button>
-            <button class="tweet-btn" type="button" title="Tweet this transfer" aria-label="Tweet">𝕏</button>
-            <button class="share-btn" type="button" title="Copy a link to this card" aria-label="Share">↗</button>
-          </div>`;
-      }).join("");
+      grid.innerHTML = players.map(renderCard).join("");
+    }
+
+    // Render a single card. Extracted so both the main grid and the Featured row can reuse it.
+    function renderCard(p) {
+      const newRank = rankOf(p.newSchool, p.gender);
+      const newRankTag = (newRank != null) ? '<span class="rank">#' + newRank + '</span>' : '';
+      const newSchoolLink = p.newSchool
+        ? '<span class="school-link" data-school="' + esc(p.newSchool) + '">' + esc(p.newSchool) + '</span>' + newRankTag
+        : '';
+      // Per-segment previous-school rank + clickable school link (handles multi-school strings).
+      const prev = p.previousSchool.split(",").map(seg => {
+        const s = seg.trim();
+        const r = rankOf(s, p.gender);
+        return '<span class="school-link" data-school="' + esc(s) + '">' + esc(s) + '</span>' +
+               (r != null ? '<span class="rank">#' + r + '</span>' : '');
+      }).join(", ");
+      const schools = p.newSchool
+        ? prev + '<span class="arrow">&rarr;</span>' + newSchoolLink
+        : prev;
+      const singlesRank = singlesRankOf(p.name, p.gender);
+      const doublesRank = doublesRankOf(p.name, p.gender);
+      let inlineRank = "";
+      if (singlesRank != null) inlineRank += ' <span class="year" title="ITA Singles #' + singlesRank + ' as of 2026-05-20">&middot; Singles #' + singlesRank + '</span>';
+      if (doublesRank != null) inlineRank += ' <span class="year" title="ITA Doubles #' + doublesRank + ' as of 2026-05-20">&middot; Doubles #' + doublesRank + '</span>';
+      const metaParts = [];
+      if (p.country) metaParts.push(esc(p.country));
+      if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
+      const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
+      const starOn = watchlist.has(p.id) ? "on" : "";
+      const starGlyph = watchlist.has(p.id) ? "★" : "☆";
+      const newBadge = isNew(p.dateUpdated) ? '<span class="new-pill">NEW</span>' : '';
+      return `
+        <div class="card" data-id="${esc(p.id)}">
+          <div class="card-top">
+            <div class="name">${esc(p.name)}${newBadge}${inlineRank}</div>
+            <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
+          </div>
+          <div class="schools">${schools}</div>
+          ${meta}
+          <button class="watch-btn ${starOn}" type="button" title="Add to / remove from your watchlist" aria-label="Watchlist">${starGlyph}</button>
+          <button class="tweet-btn" type="button" title="Tweet this transfer" aria-label="Tweet">𝕏</button>
+          <button class="share-btn" type="button" title="Copy a link to this card" aria-label="Share">↗</button>
+        </div>`;
+    }
+
+    // Featured row — manually-curated highlights. Players get `featured: true` in transfers.js.
+    // Shown above the main grid (only if there are featured players for the active gender).
+    const featuredEl = document.getElementById("featured");
+    function renderFeatured() {
+      const featured = TRANSFERS.filter(p => p.featured && genderMatch(p, activeGender));
+      if (featured.length === 0) {
+        featuredEl.innerHTML = "";
+        featuredEl.classList.remove("on");
+        return;
+      }
+      featuredEl.classList.add("on");
+      featuredEl.innerHTML =
+        '<h2 class="featured-title">🔥 Featured</h2>' +
+        '<div class="featured-grid grid">' + featured.map(renderCard).join("") + '</div>';
     }
 
     refreshStats();   // initial header counts
     refreshTopDestinations();   // initial leaderboard line
     refreshConferenceSummary(); // initial conference breakdown
     refreshWatchPill();         // initial My List pill state
+    renderFeatured();           // initial featured row (hidden if no featured players)
     render(); // draw everything for the first time
 
     // Bump the "last visit" stamp AFTER rendering so this session's NEW badges are computed
