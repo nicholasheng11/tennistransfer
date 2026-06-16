@@ -159,7 +159,8 @@
       border: none;
       border-radius: 10px;
       font-size: 15px;
-      background: var(--select-bg); color: var(--select-text);
+      background: #ffffff; color: #1a1d23;
+      color-scheme: light; /* force light-mode browser controls regardless of OS theme */
     }
 
     /* filter pills (scrollable) on the left, sort dropdown on the right */
@@ -201,7 +202,8 @@
       padding: 6px 8px;
       border: none;
       border-radius: 8px;
-      background: var(--select-bg); color: var(--select-text);
+      background: #ffffff; color: #1a1d23;
+      color-scheme: light; /* force light-mode browser controls regardless of OS theme */
       color: var(--text);
       cursor: pointer;
     }
@@ -388,7 +390,6 @@
     <h1>🎾 D1 Tennis Transfer Tracker</h1>
     <p id="stats" class="stats"></p>
     <p id="top-destinations" class="top-dest collapsible"></p>
-    <p id="conference-summary" class="top-dest collapsible"></p>
     <button id="header-details-toggle" class="header-details-toggle" type="button">ⓘ Show details</button>
     <p id="subtitle"></p>
     <input id="search" class="search" type="text" placeholder="Search player or school..." />
@@ -762,30 +763,6 @@
         '</div>';
     }
 
-    // Conference summary — incoming commits bucketed by the destination's conference.
-    // Same gender-aware basis as top destinations; sorted by count desc.
-    const confSummaryEl = document.getElementById("conference-summary");
-    function refreshConferenceSummary() {
-      let sec = 0, bigten = 0, big12 = 0, acc = 0, mid = 0;
-      TRANSFERS.forEach(p => {
-        if (!genderMatch(p, activeGender) || p.status !== "Committed" || !p.newSchool) return;
-        if (SEC.has(p.newSchool)) sec++;
-        else if (BIG_TEN.has(p.newSchool)) bigten++;
-        else if (BIG_12.has(p.newSchool)) big12++;
-        else if (ACC.has(p.newSchool)) acc++;
-        else if (isMidMajor(p.newSchool)) mid++;
-      });
-      const items = [
-        { label: "SEC", n: sec },
-        { label: "Big Ten", n: bigten },
-        { label: "Big 12", n: big12 },
-        { label: "ACC", n: acc },
-        { label: "Mid-Major", n: mid },
-      ].filter(x => x.n > 0).sort((a, b) => b.n - a.n);
-      confSummaryEl.textContent = items.length
-        ? "🏛️ Incoming by conference: " + items.map(x => x.label + " " + x.n).join(" · ")
-        : "";
-    }
 
     // Subtitle shows the most recent dateUpdated across all players.
     const latest = TRANSFERS.reduce((mx, p) => (p.dateUpdated > mx ? p.dateUpdated : mx), "");
@@ -804,7 +781,6 @@
         refreshStatusPills();
         refreshStats();
         refreshTopDestinations();
-        refreshConferenceSummary();
         refreshConfFlow();
         refreshWatchPill();
         renderFeatured();
@@ -1053,7 +1029,6 @@
 
     refreshStats();   // initial header counts
     refreshTopDestinations();   // initial leaderboard line
-    refreshConferenceSummary(); // initial conference breakdown
     refreshConfFlow();          // initial conference flow chart
     refreshWatchPill();         // initial My List pill state
     renderFeatured();           // initial featured row (hidden if no featured players)
