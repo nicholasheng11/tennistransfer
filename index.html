@@ -255,6 +255,27 @@
       font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 999px;
       margin-left: 6px; vertical-align: middle; letter-spacing: 0.5px;
     }
+
+    /* "ⓘ Show details" toggle — collapses the leaderboard + conference summary lines on phones. */
+    .header-details-toggle {
+      display: none; background: rgba(255,255,255,0.10); border: none;
+      color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 999px;
+      cursor: pointer; margin-top: 4px;
+    }
+
+    /* ---- Mobile polish: collapse header extras + denser cards ---------- */
+    @media (max-width: 640px) {
+      .header-details-toggle { display: inline-block; }
+      /* Hide leaderboard + conference summary on phones unless user expanded details. */
+      .collapsible { display: none; }
+      .collapsible.expanded { display: block; }
+      /* Tighter cards on phones — less padding, slightly smaller text. */
+      .card { padding: 12px 14px 28px; border-radius: 12px; }
+      .name { font-size: 15px; }
+      .schools { margin-top: 6px; font-size: 14px; }
+      .meta { margin-top: 6px; font-size: 11px; }
+      .grid { gap: 10px; padding: 12px; }
+    }
     .card-top {
       display: flex;
       justify-content: space-between;
@@ -319,8 +340,9 @@
     <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
     <h1>🎾 D1 Tennis Transfer Tracker</h1>
     <p id="stats" class="stats"></p>
-    <p id="top-destinations" class="top-dest"></p>
-    <p id="conference-summary" class="top-dest"></p>
+    <p id="top-destinations" class="top-dest collapsible"></p>
+    <p id="conference-summary" class="top-dest collapsible"></p>
+    <button id="header-details-toggle" class="header-details-toggle" type="button">ⓘ Show details</button>
     <p id="subtitle"></p>
     <input id="search" class="search" type="text" placeholder="Search player or school..." />
     <div id="active-school" class="active-school"></div>
@@ -495,6 +517,14 @@
         ? navigator.clipboard.writeText(text)
         : Promise.reject()
       ).then(flash).catch(() => { window.prompt("Copy this digest:", text); });
+    };
+
+    // Mobile-only "ⓘ Show details" toggle for the leaderboard + conference summary lines.
+    const headerDetailsToggle = document.getElementById("header-details-toggle");
+    headerDetailsToggle.onclick = () => {
+      const expanded = headerDetailsToggle.textContent.includes("Hide");
+      document.querySelectorAll(".collapsible").forEach(el => el.classList.toggle("expanded", !expanded));
+      headerDetailsToggle.textContent = expanded ? "ⓘ Show details" : "ⓘ Hide details";
     };
 
     // Theme toggle — the initial data-theme was already set by the inline script in <head>.
