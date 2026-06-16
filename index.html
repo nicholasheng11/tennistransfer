@@ -69,20 +69,13 @@
       --text: #e5e7eb;
       --muted: #94a3b8;
       --border: #334155;
-      --select-bg: #1e293b;
-      --select-text: #e5e7eb;
       --card-hover-shadow: rgba(0, 0, 0, 0.45);
       --share-hover-bg: #334155;
       --code-bg: #334155;
       --link: #60a5fa;
-      /* Inverted header in dark mode: light bg + navy text. */
-      --header-bg: #f4f5f7;
-      --header-text: #11203a;
-      --header-pill-bg: rgba(17,32,58,0.08);
-      --header-pill-active-bg: #11203a;
-      --header-pill-active-text: #ffffff;
-      --header-toggle-bg: rgba(17,32,58,0.08);
-      --header-toggle-bg-hover: rgba(17,32,58,0.15);
+      /* The header keeps its navy palette in dark mode (no inversion). All --header-* and
+         --select-* values stay at their light-mode defaults — so the navy header + white
+         search input + white dropdowns remain a fixed top bar regardless of theme. */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
