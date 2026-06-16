@@ -224,18 +224,19 @@
       padding: 12px 16px 40px;
     }
 
-    /* ---- Card: avatar (left) + content (right) two-column grid -------- */
+    /* ---- Card: [avatar + action buttons stacked] in left column | content in right column. */
     .card {
       position: relative;
       display: grid;
-      grid-template-columns: 44px 1fr;
+      grid-template-columns: 50px 1fr;
       gap: 12px;
       background: var(--card);
       border: 1px solid #e5e7eb;
       border-radius: 14px;
-      padding: 16px 18px;
+      padding: 14px 16px;
       transition: transform 150ms ease, box-shadow 150ms ease;
     }
+    .card-left { display: flex; flex-direction: column; align-items: center; }
     .card-content { min-width: 0; } /* allow long names/schools to wrap inside the grid cell */
     /* Avatar — circular initials by default, replaced by <img> if photoUrl present.
        Color is derived from the player's name so each card is visually distinct. */
@@ -247,7 +248,6 @@
       color: #fff;
       flex-shrink: 0;
       overflow: hidden;
-      align-self: start;
     }
     .avatar-initials {
       position: absolute; inset: 0;
@@ -295,15 +295,18 @@
       100% { background: var(--card); box-shadow: 0 6px 16px var(--card-hover-shadow); }
     }
     .card.flash { animation: cardFlash 2.4s ease-out; }
-    /* Action buttons in the bottom-right of each card: ☆ watch · 𝕏 tweet · ↗ share. */
-    .share-btn, .tweet-btn, .watch-btn {
-      position: absolute; bottom: 10px;
-      background: transparent; border: none; cursor: pointer;
-      line-height: 1; color: #9ca3af; padding: 4px 6px; border-radius: 6px;
+    /* Action buttons (☆ watch · 𝕏 tweet · ↗ share) — row sits under the avatar in the left column. */
+    .card-actions {
+      display: flex; justify-content: space-between; align-items: center;
+      width: 50px; margin-top: 6px;
     }
-    .share-btn { right: 12px; font-size: 14px; }
-    .tweet-btn { right: 38px; font-size: 12px; font-weight: 700; }
-    .watch-btn { right: 64px; font-size: 16px; }
+    .share-btn, .tweet-btn, .watch-btn {
+      background: transparent; border: none; cursor: pointer;
+      line-height: 1; color: #9ca3af; padding: 2px 4px; border-radius: 4px;
+    }
+    .share-btn { font-size: 13px; }
+    .tweet-btn { font-size: 11px; font-weight: 700; }
+    .watch-btn { font-size: 14px; }
     .share-btn:hover, .tweet-btn:hover, .watch-btn:hover { color: var(--text); background: var(--share-hover-bg); }
     .share-btn.copied { color: var(--accent); }
     .watch-btn.on, .watch-btn.on:hover { color: #f59e0b; }
@@ -361,10 +364,13 @@
       /* Hide leaderboard + conference summary on phones unless user expanded details. */
       .collapsible { display: none; }
       .collapsible.expanded { display: block; }
-      /* Tighter cards on phones — smaller avatar + less padding + slightly smaller text. */
-      .card { grid-template-columns: 36px 1fr; gap: 10px; padding: 12px 14px 28px; border-radius: 12px; }
+      /* Tighter cards on phones — smaller avatar, less padding, smaller text. */
+      .card { grid-template-columns: 42px 1fr; gap: 10px; padding: 10px 12px; border-radius: 12px; }
       .avatar { width: 36px; height: 36px; }
       .avatar-initials { font-size: 13px; }
+      .card-actions { width: 42px; margin-top: 4px; }
+      .share-btn, .tweet-btn { font-size: 11px; padding: 1px 3px; }
+      .watch-btn { font-size: 12px; padding: 1px 3px; }
       .name { font-size: 15px; }
       .schools { margin-top: 6px; font-size: 14px; }
       .meta { margin-top: 6px; font-size: 11px; }
@@ -1080,9 +1086,16 @@
         : '';
       return `
         <div class="card" data-id="${esc(p.id)}">
-          <div class="avatar" style="--avatar-h: ${avatarHue(p.name)};" aria-hidden="true">
-            <span class="avatar-initials">${esc(inits)}</span>
-            ${photoImg}
+          <div class="card-left">
+            <div class="avatar" style="--avatar-h: ${avatarHue(p.name)};" aria-hidden="true">
+              <span class="avatar-initials">${esc(inits)}</span>
+              ${photoImg}
+            </div>
+            <div class="card-actions">
+              <button class="watch-btn ${starOn}" type="button" title="Add to / remove from your watchlist" aria-label="Watchlist">${starGlyph}</button>
+              <button class="tweet-btn" type="button" title="Tweet this transfer" aria-label="Tweet">𝕏</button>
+              <button class="share-btn" type="button" title="Copy a link to this card" aria-label="Share">↗</button>
+            </div>
           </div>
           <div class="card-content">
             <div class="card-top">
@@ -1092,9 +1105,6 @@
             <div class="schools">${schools}</div>
             ${meta}
           </div>
-          <button class="watch-btn ${starOn}" type="button" title="Add to / remove from your watchlist" aria-label="Watchlist">${starGlyph}</button>
-          <button class="tweet-btn" type="button" title="Tweet this transfer" aria-label="Tweet">𝕏</button>
-          <button class="share-btn" type="button" title="Copy a link to this card" aria-label="Share">↗</button>
         </div>`;
     }
 
