@@ -16,6 +16,38 @@
     })();
   </script>
   <meta name="description" content="Live tracker of D1 men's and women's tennis transfer portal entries and commitments. Filter by conference, ranking, and UTR." />
+  <link rel="canonical" href="https://tennistransferportal.com/" />
+
+  <!-- Schema.org structured data — helps search engines understand the site as a sports-transfer dataset. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://tennistransferportal.com/#website",
+        "name": "D1 Tennis Transfer Tracker",
+        "url": "https://tennistransferportal.com/",
+        "description": "Live tracker of D1 men's and women's tennis transfer portal entries and commitments.",
+        "inLanguage": "en-US",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": { "@type": "EntryPoint", "urlTemplate": "https://tennistransferportal.com/?q={search_term_string}" },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "Dataset",
+        "@id": "https://tennistransferportal.com/#dataset",
+        "name": "D1 Tennis Transfer Portal Dataset",
+        "description": "Curated dataset of NCAA Division I men's and women's tennis transfer portal entries and commitments, with UTR snapshots and ITA rankings.",
+        "url": "https://tennistransferportal.com/",
+        "creator": { "@type": "Person", "name": "Nicholas Heng" },
+        "keywords": ["NCAA tennis", "transfer portal", "D1 tennis", "college tennis", "tennis transfers", "UTR", "ITA rankings"]
+      }
+    ]
+  }
+  </script>
 
   <link rel="icon" type="image/svg+xml" href="icon.svg" />
   <link rel="manifest" href="manifest.json" />

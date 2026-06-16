@@ -1,0 +1,10 @@
+# Allow all crawlers — public tracker.
+User-agent: *
+Allow: /
+
+# Internal-only utility pages (not linked from the live site, but block from crawlers anyway).
+Disallow: /add-player.html
+Disallow: /lint.html
+Disallow: /og-image.html
+
+Sitemap: https://tennistransferportal.com/sitemap.xml
