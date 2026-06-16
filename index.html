@@ -283,11 +283,23 @@
     .featured-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); letter-spacing: 0.3px; }
     .featured-grid { padding: 0; }
 
-    /* Conference flow chart — small horizontal bar viz showing where players move FROM → TO at the conference level. */
+    /* Conference flow chart — wrapped in <details> so visitors expand it only when they want the chart.
+       Closed by default keeps the top of the page tight. */
     .conf-flow { display: none; max-width: 1200px; margin: 16px auto 0; padding: 0 16px; }
     .conf-flow.on { display: block; }
-    .conf-flow-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); letter-spacing: 0.3px; }
-    .conf-flow-list { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+    .conf-flow details { background: var(--card); border: 1px solid var(--border); border-radius: 10px; }
+    .conf-flow summary {
+      list-style: none; cursor: pointer; user-select: none;
+      padding: 12px 16px; font-size: 14px; font-weight: 700;
+      color: var(--text); letter-spacing: 0.3px;
+    }
+    .conf-flow summary::-webkit-details-marker { display: none; }
+    .conf-flow summary::after {
+      content: "▸"; float: right; color: var(--muted); transition: transform 150ms ease;
+      display: inline-block; transform-origin: center;
+    }
+    .conf-flow details[open] summary::after { transform: rotate(90deg); }
+    .conf-flow-list { padding: 0 16px 14px; }
     .flow-item { display: grid; grid-template-columns: 170px 1fr 32px; align-items: center; gap: 12px; padding: 4px 0; }
     .flow-pair { font-size: 13px; font-weight: 500; color: var(--text); }
     .flow-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
@@ -763,16 +775,18 @@
       const max = sorted[0][1];
       confFlowEl.classList.add("on");
       confFlowEl.innerHTML =
-        '<h2 class="conf-flow-title">📊 Conference flows</h2>' +
-        '<div class="conf-flow-list">' +
-        sorted.map(([pair, n]) =>
-          '<div class="flow-item">' +
-            '<span class="flow-pair">' + esc(pair) + '</span>' +
-            '<div class="flow-bar"><div class="flow-bar-fill" style="width: ' + (n / max * 100).toFixed(0) + '%"></div></div>' +
-            '<span class="flow-n">' + n + '</span>' +
-          '</div>'
-        ).join("") +
-        '</div>';
+        '<details>' +
+          '<summary>📊 Conference flows</summary>' +
+          '<div class="conf-flow-list">' +
+          sorted.map(([pair, n]) =>
+            '<div class="flow-item">' +
+              '<span class="flow-pair">' + esc(pair) + '</span>' +
+              '<div class="flow-bar"><div class="flow-bar-fill" style="width: ' + (n / max * 100).toFixed(0) + '%"></div></div>' +
+              '<span class="flow-n">' + n + '</span>' +
+            '</div>'
+          ).join("") +
+          '</div>' +
+        '</details>';
     }
 
 
