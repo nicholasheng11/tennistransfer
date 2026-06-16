@@ -227,13 +227,15 @@
       100% { background: var(--card); box-shadow: 0 6px 16px var(--card-hover-shadow); }
     }
     .card.flash { animation: cardFlash 2.4s ease-out; }
-    /* Share button: small subtle icon in the bottom-right; click copies a deep link. */
-    .share-btn {
-      position: absolute; right: 12px; bottom: 10px;
+    /* Share + tweet buttons: small subtle icons in the bottom-right of each card. */
+    .share-btn, .tweet-btn {
+      position: absolute; bottom: 10px;
       background: transparent; border: none; cursor: pointer;
-      font-size: 14px; line-height: 1; color: #9ca3af; padding: 4px 6px; border-radius: 6px;
+      line-height: 1; color: #9ca3af; padding: 4px 6px; border-radius: 6px;
     }
-    .share-btn:hover { color: var(--text); background: var(--share-hover-bg); }
+    .share-btn { right: 12px; font-size: 14px; }
+    .tweet-btn { right: 38px; font-size: 12px; font-weight: 700; }
+    .share-btn:hover, .tweet-btn:hover { color: var(--text); background: var(--share-hover-bg); }
     .share-btn.copied { color: var(--accent); }
     .card-top {
       display: flex;
@@ -800,6 +802,7 @@
             </div>
             <div class="schools">${schools}</div>
             ${meta}
+            <button class="tweet-btn" type="button" title="Tweet this transfer" aria-label="Tweet">𝕏</button>
             <button class="share-btn" type="button" title="Copy a link to this card" aria-label="Share">↗</button>
           </div>`;
       }).join("");
@@ -810,13 +813,34 @@
     refreshConferenceSummary(); // initial conference breakdown
     render(); // draw everything for the first time
 
-    // Card click delegation: handles both ↗ share button and clickable school names.
+    // Card click delegation: handles school-name links, the tweet button, and the share button.
     grid.addEventListener("click", e => {
       // School-name click → set the exact-school filter and re-render.
       const schoolLink = e.target.closest(".school-link");
       if (schoolLink) {
         setSchoolFilter(schoolLink.dataset.school);
         window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      // Tweet button → open X intent with pre-filled text.
+      const tweetBtn = e.target.closest(".tweet-btn");
+      if (tweetBtn) {
+        const card = tweetBtn.closest("[data-id]");
+        if (!card) return;
+        const id = card.dataset.id;
+        const p = TRANSFERS.find(x => String(x.id) === id);
+        if (!p) return;
+        const url = location.origin + location.pathname + "?p=" + encodeURIComponent(id);
+        const utrPart = p.utr ? " (UTR " + p.utr + ")" : "";
+        let text;
+        if (p.status === "Committed" && p.newSchool) {
+          text = p.name + utrPart + ": " + p.previousSchool + " → " + p.newSchool;
+        } else {
+          text = p.name + utrPart + " enters the portal from " + p.previousSchool;
+        }
+        text += "\n\n" + url;
+        const intent = "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text);
+        window.open(intent, "_blank", "noopener,noreferrer");
         return;
       }
       const btn = e.target.closest(".share-btn");
