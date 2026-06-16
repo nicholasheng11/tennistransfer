@@ -227,16 +227,25 @@
       100% { background: var(--card); box-shadow: 0 6px 16px var(--card-hover-shadow); }
     }
     .card.flash { animation: cardFlash 2.4s ease-out; }
-    /* Share + tweet buttons: small subtle icons in the bottom-right of each card. */
-    .share-btn, .tweet-btn {
+    /* Action buttons in the bottom-right of each card: ☆ watch · 𝕏 tweet · ↗ share. */
+    .share-btn, .tweet-btn, .watch-btn {
       position: absolute; bottom: 10px;
       background: transparent; border: none; cursor: pointer;
       line-height: 1; color: #9ca3af; padding: 4px 6px; border-radius: 6px;
     }
     .share-btn { right: 12px; font-size: 14px; }
     .tweet-btn { right: 38px; font-size: 12px; font-weight: 700; }
-    .share-btn:hover, .tweet-btn:hover { color: var(--text); background: var(--share-hover-bg); }
+    .watch-btn { right: 64px; font-size: 16px; }
+    .share-btn:hover, .tweet-btn:hover, .watch-btn:hover { color: var(--text); background: var(--share-hover-bg); }
     .share-btn.copied { color: var(--accent); }
+    .watch-btn.on, .watch-btn.on:hover { color: #f59e0b; }
+
+    /* "NEW" pill that appears next to a player's name if the entry was added/updated since the user's last visit. */
+    .new-pill {
+      display: inline-block; background: #fbbf24; color: #78350f;
+      font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 999px;
+      margin-left: 6px; vertical-align: middle; letter-spacing: 0.5px;
+    }
     .card-top {
       display: flex;
       justify-content: space-between;
@@ -308,6 +317,7 @@
     <div id="gender-filters" class="filters"></div>
     <div class="controls">
       <div id="filters" class="filters"></div>
+      <button id="watchlist-btn" class="filter-btn" type="button" title="Show only your watchlist"></button>
       <div class="sortwrap">
         <label for="sort">Sort:</label>
         <select id="sort">
@@ -384,6 +394,24 @@
     let p4Filter = "all";
     let countryFilter = "all";
     let schoolFilter = ""; // exact-match school filter, set by clicking a school name on a card
+    let watchlistMode = false; // when true, only show players in the user's local watchlist
+
+    // ---- Watchlist (☆ favorites, persisted in localStorage) ---------------
+    const WATCHLIST_KEY = "tennistracker.watchlist";
+    let watchlist;
+    try { watchlist = new Set(JSON.parse(localStorage.getItem(WATCHLIST_KEY) || "[]")); }
+    catch (e) { watchlist = new Set(); }
+    function saveWatchlist() {
+      try { localStorage.setItem(WATCHLIST_KEY, JSON.stringify([...watchlist])); }
+      catch (e) { /* private mode / storage full — ignore */ }
+    }
+
+    // ---- "NEW since last visit" tracker -----------------------------------
+    // Snapshot the last-visit date BEFORE we overwrite it, so this session's render shows
+    // NEW badges for everything added/updated after the previous visit.
+    const LAST_VISIT_KEY = "tennistracker.lastvisit";
+    const lastVisit = localStorage.getItem(LAST_VISIT_KEY) || "1970-01-01";
+    const isNew = iso => iso && iso > lastVisit;
 
     // Page elements we'll be updating.
     const grid = document.getElementById("grid");
@@ -395,6 +423,19 @@
     const p4El = document.getElementById("p4");
     const countryEl = document.getElementById("country");
     const activeSchoolEl = document.getElementById("active-school");
+
+    // My List pill — toggles the watchlist filter on/off and shows current count.
+    const watchlistBtn = document.getElementById("watchlist-btn");
+    function refreshWatchPill() {
+      const count = TRANSFERS.filter(p => genderMatch(p, activeGender) && watchlist.has(p.id)).length;
+      watchlistBtn.innerHTML = (watchlistMode ? "★" : "☆") + ' My List <span class="pill-count">' + count + '</span>';
+      watchlistBtn.classList.toggle("active", watchlistMode);
+    }
+    watchlistBtn.onclick = () => {
+      watchlistMode = !watchlistMode;
+      refreshWatchPill();
+      render();
+    };
 
     // Set/clear the exact-match school filter (triggered by clicking a school name on any card).
     function setSchoolFilter(school) {
@@ -594,6 +635,7 @@
         refreshStats();
         refreshTopDestinations();
         refreshConferenceSummary();
+        refreshWatchPill();
         render();
       };
       genderFiltersEl.appendChild(btn);
@@ -673,6 +715,11 @@
           if (p.newSchool === schoolFilter) return true;
           return p.previousSchool.split(",").some(s => s.trim() === schoolFilter);
         });
+      }
+
+      // 2c. watchlist filter — when My List pill is active, only show favorited players.
+      if (watchlistMode) {
+        players = players.filter(p => watchlist.has(p.id));
       }
 
       // 2b. School filter: Power 4 or Mid-Major, by destination ("to") or origin ("from")
@@ -794,14 +841,18 @@
         if (p.country) metaParts.push(esc(p.country));
         if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
         const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
+        const starOn = watchlist.has(p.id) ? "on" : "";
+        const starGlyph = watchlist.has(p.id) ? "★" : "☆";
+        const newBadge = isNew(p.dateUpdated) ? '<span class="new-pill">NEW</span>' : '';
         return `
           <div class="card" data-id="${esc(p.id)}">
             <div class="card-top">
-              <div class="name">${esc(p.name)}${inlineRank}</div>
+              <div class="name">${esc(p.name)}${newBadge}${inlineRank}</div>
               <div class="badge ${badgeClass(p.status)}">${esc(p.status)}</div>
             </div>
             <div class="schools">${schools}</div>
             ${meta}
+            <button class="watch-btn ${starOn}" type="button" title="Add to / remove from your watchlist" aria-label="Watchlist">${starGlyph}</button>
             <button class="tweet-btn" type="button" title="Tweet this transfer" aria-label="Tweet">𝕏</button>
             <button class="share-btn" type="button" title="Copy a link to this card" aria-label="Share">↗</button>
           </div>`;
@@ -811,15 +862,34 @@
     refreshStats();   // initial header counts
     refreshTopDestinations();   // initial leaderboard line
     refreshConferenceSummary(); // initial conference breakdown
+    refreshWatchPill();         // initial My List pill state
     render(); // draw everything for the first time
 
-    // Card click delegation: handles school-name links, the tweet button, and the share button.
+    // Bump the "last visit" stamp AFTER rendering so this session's NEW badges are computed
+    // against the PREVIOUS visit. Next session will diff against today.
+    try { localStorage.setItem(LAST_VISIT_KEY, new Date().toISOString().split("T")[0]); }
+    catch (e) {}
+
+    // Card click delegation: handles school links, watch ☆, tweet 𝕏, and share ↗ buttons.
     grid.addEventListener("click", e => {
       // School-name click → set the exact-school filter and re-render.
       const schoolLink = e.target.closest(".school-link");
       if (schoolLink) {
         setSchoolFilter(schoolLink.dataset.school);
         window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      // Watchlist star toggle → flip favorited state, persist, update star + pill count.
+      const watchBtn = e.target.closest(".watch-btn");
+      if (watchBtn) {
+        const card = watchBtn.closest("[data-id]");
+        if (!card) return;
+        const id = card.dataset.id;
+        if (watchlist.has(id)) { watchlist.delete(id); watchBtn.classList.remove("on"); watchBtn.textContent = "☆"; }
+        else { watchlist.add(id); watchBtn.classList.add("on"); watchBtn.textContent = "★"; }
+        saveWatchlist();
+        refreshWatchPill();
+        if (watchlistMode) render();   // the un-favorited card needs to disappear when filtering by My List
         return;
       }
       // Tweet button → open X intent with pre-filled text.
