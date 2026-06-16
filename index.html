@@ -731,10 +731,13 @@
       grid.innerHTML = players.map(p => {
         const newRank = rankOf(p.newSchool, p.gender);
         const newRankTag = (newRank != null) ? '<span class="rank">#' + newRank + '</span>' : '';
-        // Previous-school rank — skip lookup for multi-school strings like "Arkansas, Charlotte".
-        const prevRank = p.previousSchool.includes(",") ? null : rankOf(p.previousSchool, p.gender);
-        const prevRankTag = (prevRank != null) ? '<span class="rank">#' + prevRank + '</span>' : '';
-        const prev = esc(p.previousSchool) + prevRankTag;
+        // Previous-school rank — for multi-school strings like "Pepperdine, South Carolina",
+        // look up each segment so each ranked stop shows its own #X badge.
+        const prev = p.previousSchool.split(",").map(seg => {
+          const s = seg.trim();
+          const r = rankOf(s, p.gender);
+          return esc(s) + (r != null ? '<span class="rank">#' + r + '</span>' : '');
+        }).join(", ");
         const schools = p.newSchool
           ? prev + '<span class="arrow">&rarr;</span>' + esc(p.newSchool) + newRankTag
           : prev;
