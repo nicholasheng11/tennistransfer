@@ -489,10 +489,22 @@
     }
 
     // ---- "NEW since last visit" tracker -----------------------------------
-    // Snapshot the last-visit date BEFORE we overwrite it, so this session's render shows
-    // NEW badges for everything added/updated after the previous visit.
+    // Snapshot the last-visit date BEFORE we overwrite it. NEW badges only render for entries
+    // whose dateUpdated is strictly newer. On a FIRST visit (no stored value), stamp today's
+    // date immediately so we don't flag every card as "new" to a brand-new visitor.
     const LAST_VISIT_KEY = "tennistracker.lastvisit";
-    const lastVisit = localStorage.getItem(LAST_VISIT_KEY) || "1970-01-01";
+    let lastVisit;
+    try {
+      const stored = localStorage.getItem(LAST_VISIT_KEY);
+      if (stored) {
+        lastVisit = stored;
+      } else {
+        lastVisit = new Date().toISOString().split("T")[0];
+        localStorage.setItem(LAST_VISIT_KEY, lastVisit);
+      }
+    } catch (e) {
+      lastVisit = new Date().toISOString().split("T")[0]; // localStorage blocked — no badges
+    }
     const isNew = iso => iso && iso > lastVisit;
 
     // Page elements we'll be updating.
