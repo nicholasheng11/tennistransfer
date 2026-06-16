@@ -96,14 +96,17 @@
       top: 0;
       z-index: 10;
     }
-    /* Theme toggle pinned in the top-right of the header. */
-    .theme-toggle {
-      position: absolute; top: 14px; right: 14px;
+    /* Theme toggle + digest export, pinned in the top-right of the header. */
+    .theme-toggle, .digest-btn {
+      position: absolute; top: 14px;
       background: var(--header-toggle-bg); border: none; color: var(--header-text);
-      font-size: 16px; cursor: pointer; padding: 6px 10px; border-radius: 999px;
-      line-height: 1;
+      font-size: 13px; cursor: pointer; padding: 6px 12px; border-radius: 999px;
+      line-height: 1; white-space: nowrap;
     }
-    .theme-toggle:hover { background: var(--header-toggle-bg-hover); }
+    .theme-toggle { right: 14px; font-size: 16px; padding: 6px 10px; }
+    .digest-btn   { right: 64px; }
+    .theme-toggle:hover, .digest-btn:hover { background: var(--header-toggle-bg-hover); }
+    .digest-btn.copied { background: var(--accent); color: #fff; }
     header h1 { font-size: 19px; font-weight: 700; }
     header p  { font-size: 13px; opacity: 0.75; margin-top: 2px; }
     header p.stats { font-size: 13px; opacity: 0.9; margin-top: 4px; font-weight: 500; letter-spacing: 0.2px; }
@@ -312,6 +315,7 @@
 
 <body>
   <header>
+    <button id="digest-btn" class="digest-btn" type="button" aria-label="Copy weekly digest" title="Copy a summary of the last 7 days of commits to your clipboard">📋 Digest</button>
     <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
     <h1>🎾 D1 Tennis Transfer Tracker</h1>
     <p id="stats" class="stats"></p>
@@ -457,6 +461,41 @@
       }
       render();
     }
+
+    // Digest export — copy a plain-text summary of the last 7 days of commits to clipboard.
+    // Respects the active gender pill so curators can tweet a men's-only or women's-only recap.
+    const digestBtn = document.getElementById("digest-btn");
+    digestBtn.onclick = () => {
+      const today = new Date();
+      const cutoffDate = new Date(today); cutoffDate.setDate(today.getDate() - 7);
+      const pad = n => String(n).padStart(2, "0");
+      const cutoff = cutoffDate.getFullYear() + "-" + pad(cutoffDate.getMonth() + 1) + "-" + pad(cutoffDate.getDate());
+      const recent = TRANSFERS
+        .filter(p => genderMatch(p, activeGender) && p.status === "Committed" && p.dateUpdated >= cutoff && p.newSchool)
+        .sort((a, b) => b.dateUpdated.localeCompare(a.dateUpdated));
+      if (recent.length === 0) {
+        alert("No commits in the last 7 days for the current gender view.");
+        return;
+      }
+      const label = activeGender === "All" ? "" : (activeGender + " — ");
+      let text = "📊 " + label + "Tennis Transfer Tracker — last 7 days\n";
+      text += "tennistransferportal.com\n\n";
+      recent.forEach(p => {
+        const utrPart = p.utr ? " (UTR " + p.utr + ")" : "";
+        text += "• " + p.name + utrPart + ": " + p.previousSchool + " → " + p.newSchool + "\n";
+      });
+      text += "\n" + recent.length + " commit" + (recent.length === 1 ? "" : "s") + " this week.";
+      const flash = () => {
+        digestBtn.classList.add("copied");
+        const orig = digestBtn.textContent;
+        digestBtn.textContent = "✓ Copied " + recent.length;
+        setTimeout(() => { digestBtn.classList.remove("copied"); digestBtn.textContent = orig; }, 2000);
+      };
+      (navigator.clipboard && navigator.clipboard.writeText
+        ? navigator.clipboard.writeText(text)
+        : Promise.reject()
+      ).then(flash).catch(() => { window.prompt("Copy this digest:", text); });
+    };
 
     // Theme toggle — the initial data-theme was already set by the inline script in <head>.
     // This just wires the button to flip it and persists the choice in localStorage.
