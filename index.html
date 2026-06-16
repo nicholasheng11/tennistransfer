@@ -199,11 +199,17 @@
     .sortwrap label { font-size: 13px; color: var(--header-text); opacity: 0.75; }
     .sortwrap select {
       font-size: 13px;
-      padding: 6px 8px;
+      padding: 6px 26px 6px 10px;
       border: none;
       border-radius: 8px;
-      background: #ffffff; color: #1a1d23;
-      color-scheme: light; /* force light-mode browser controls regardless of OS theme */
+      background-color: #ffffff !important;
+      color: #1a1d23 !important;
+      color-scheme: light;
+      /* Disable Windows/Chrome native dark-mode tinting of <select>; supply our own arrow. */
+      appearance: none; -webkit-appearance: none; -moz-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5L6 6.5L11 1.5' stroke='%231a1d23' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
       color: var(--text);
       cursor: pointer;
     }
