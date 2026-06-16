@@ -249,6 +249,21 @@
     .featured-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); letter-spacing: 0.3px; }
     .featured-grid { padding: 0; }
 
+    /* Conference flow chart — small horizontal bar viz showing where players move FROM → TO at the conference level. */
+    .conf-flow { display: none; max-width: 1200px; margin: 16px auto 0; padding: 0 16px; }
+    .conf-flow.on { display: block; }
+    .conf-flow-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--text); letter-spacing: 0.3px; }
+    .conf-flow-list { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+    .flow-item { display: grid; grid-template-columns: 170px 1fr 32px; align-items: center; gap: 12px; padding: 4px 0; }
+    .flow-pair { font-size: 13px; font-weight: 500; color: var(--text); }
+    .flow-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .flow-bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 200ms ease; }
+    .flow-n { font-weight: 700; color: var(--muted); text-align: right; font-size: 13px; }
+    @media (max-width: 640px) {
+      .flow-item { grid-template-columns: 130px 1fr 24px; gap: 8px; }
+      .flow-pair { font-size: 11px; }
+    }
+
     /* "NEW" pill that appears next to a player's name if the entry was added/updated since the user's last visit. */
     .new-pill {
       display: inline-block; background: #fbbf24; color: #78350f;
@@ -386,6 +401,7 @@
   </header>
 
   <section id="featured" class="featured"></section>
+  <section id="conf-flow" class="conf-flow"></section>
   <div id="count" class="count"></div>
   <div id="grid" class="grid"></div>
 
@@ -668,6 +684,52 @@
         : "";
     }
 
+    // Classify a school string into a high-level conference bucket — used by the flow chart below.
+    function conferenceOf(school) {
+      if (!school) return null;
+      const s = mostRecentSchool(school); // multi-school previousSchool → use the most recent stop
+      if (SEC.has(s)) return "SEC";
+      if (BIG_TEN.has(s)) return "Big Ten";
+      if (BIG_12.has(s)) return "Big 12";
+      if (ACC.has(s)) return "ACC";
+      if (NON_D1.has(s)) return null;  // D2/JUCO origins — exclude from D1 flow chart
+      return "Mid-Major";
+    }
+
+    // Conference flow chart — horizontal bars showing the top "FROM-conference → TO-conference" pairs
+    // among committed players for the active gender. Top 8 pairs by count, sorted desc.
+    const confFlowEl = document.getElementById("conf-flow");
+    function refreshConfFlow() {
+      const counts = {};
+      TRANSFERS.forEach(p => {
+        if (!genderMatch(p, activeGender) || p.status !== "Committed" || !p.newSchool || !p.previousSchool) return;
+        const from = conferenceOf(p.previousSchool);
+        const to   = conferenceOf(p.newSchool);
+        if (!from || !to) return;
+        const k = from + " → " + to;
+        counts[k] = (counts[k] || 0) + 1;
+      });
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+      if (sorted.length === 0) {
+        confFlowEl.classList.remove("on");
+        confFlowEl.innerHTML = "";
+        return;
+      }
+      const max = sorted[0][1];
+      confFlowEl.classList.add("on");
+      confFlowEl.innerHTML =
+        '<h2 class="conf-flow-title">📊 Conference flows</h2>' +
+        '<div class="conf-flow-list">' +
+        sorted.map(([pair, n]) =>
+          '<div class="flow-item">' +
+            '<span class="flow-pair">' + esc(pair) + '</span>' +
+            '<div class="flow-bar"><div class="flow-bar-fill" style="width: ' + (n / max * 100).toFixed(0) + '%"></div></div>' +
+            '<span class="flow-n">' + n + '</span>' +
+          '</div>'
+        ).join("") +
+        '</div>';
+    }
+
     // Conference summary — incoming commits bucketed by the destination's conference.
     // Same gender-aware basis as top destinations; sorted by count desc.
     const confSummaryEl = document.getElementById("conference-summary");
@@ -711,6 +773,7 @@
         refreshStats();
         refreshTopDestinations();
         refreshConferenceSummary();
+        refreshConfFlow();
         refreshWatchPill();
         renderFeatured();
         render();
@@ -959,6 +1022,7 @@
     refreshStats();   // initial header counts
     refreshTopDestinations();   // initial leaderboard line
     refreshConferenceSummary(); // initial conference breakdown
+    refreshConfFlow();          // initial conference flow chart
     refreshWatchPill();         // initial My List pill state
     renderFeatured();           // initial featured row (hidden if no featured players)
     render(); // draw everything for the first time
