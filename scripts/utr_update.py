@@ -216,6 +216,7 @@ def cmd_test(cfg, args):
 
 def cmd_match(cfg, args):
     auto = "--auto" in args
+    loose = "--loose" in args  # also accept surname-only matches (for nicknames), still gated by UTR proximity
     lines, recs, last = read_records()
     today = datetime.date.today().isoformat()
     changed = 0
@@ -236,12 +237,15 @@ def cmd_match(cfg, args):
                     cands = g or cands
                 nt = name_tokens(name)
                 named = [c for c in cands if nt and nt <= name_tokens(c["name"])]
+                if loose and not named:
+                    sn = name_tokens(name.split()[-1]) if name.split() else set()
+                    named = [c for c in cands if sn and sn <= name_tokens(c["name"])]
                 rated = [c for c in named if c["utr"] is not None]
                 chosen, how = None, ""
                 if our_utr is not None and rated:
                     best = min(rated, key=lambda c: abs(c["utr"] - our_utr))
                     if abs(best["utr"] - our_utr) <= AUTO_UTR_TOLERANCE:
-                        chosen, how = best, "auto~UTR"
+                        chosen, how = best, ("loose~UTR" if loose and nt - name_tokens(best["name"]) else "auto~UTR")
                 if not chosen and our_utr is None and len(rated) == 1:
                     chosen, how = rated[0], "auto-1rated"
                 if not chosen and not auto:
@@ -253,7 +257,7 @@ def cmd_match(cfg, args):
                         line = set_field(line, "utr", f"{chosen['utr']:.2f}")
                         line = set_field(line, "utrUpdated", today, after="utr")
                     lines[i] = line
-                    print(f"  linked {name:<26} -> id {chosen['id']:>9}  UTR {chosen['utr']}  ({how})")
+                    print(f"  linked {name:<24} -> {chosen['name']:<26} UTR {chosen['utr']}  ({how})")
                     changed += 1
                 else:
                     skipped.append(name)
