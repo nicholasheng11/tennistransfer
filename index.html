@@ -790,7 +790,7 @@
       if (BIG_12.has(s)) return "Big 12";
       if (ACC.has(s)) return "ACC";
       if (NON_D1.has(s)) return null;  // D2/JUCO origins — exclude from D1 flow chart
-      return "Mid-Major";
+      return null;  // non-P4 D1 (Mid-Major) — excluded so the flow chart shows Power 4 conferences only
     }
 
     // Conference flow chart — horizontal bars showing the top "FROM-conference → TO-conference" pairs
@@ -816,7 +816,7 @@
       confFlowEl.classList.add("on");
       confFlowEl.innerHTML =
         '<details>' +
-          '<summary>📊 Conference flows</summary>' +
+          '<summary>📊 Power 4 Conference flows</summary>' +
           '<div class="conf-flow-list">' +
           sorted.map(([pair, n]) =>
             '<div class="flow-item">' +
