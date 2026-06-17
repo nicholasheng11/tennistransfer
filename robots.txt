@@ -1,10 +1,4 @@
-# Allow all crawlers — public tracker.
+# Private / unlisted tracker — keep this off search engines.
+# The site still works for anyone who has the link; we just do not want it indexed.
 User-agent: *
-Allow: /
-
-# Internal-only utility pages (not linked from the live site, but block from crawlers anyway).
-Disallow: /add-player.html
-Disallow: /lint.html
-Disallow: /og-image.html
-
-Sitemap: https://tennistransferportal.com/sitemap.xml
+Disallow: /
