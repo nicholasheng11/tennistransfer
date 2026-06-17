@@ -228,7 +228,7 @@
     .card {
       position: relative;
       display: grid;
-      grid-template-columns: 72px 1fr;
+      grid-template-columns: 88px 1fr;
       gap: 12px;
       background: var(--card);
       border: 1px solid #e5e7eb;
@@ -243,7 +243,7 @@
        Color is derived from the player's name so each card is visually distinct. */
     .avatar {
       position: relative;
-      width: 64px; height: 64px;
+      width: 80px; height: 80px;
       border-radius: 50%;
       background: hsl(var(--avatar-h, 200), 55%, 58%);
       color: #fff;
@@ -253,7 +253,7 @@
     .avatar-initials {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; font-weight: 700; letter-spacing: 0.3px;
+      font-size: 27px; font-weight: 700; letter-spacing: 0.3px;
     }
     .avatar img {
       position: relative; z-index: 1;   /* sits ON TOP of initials when loaded */
@@ -299,7 +299,7 @@
     /* Action buttons (☆ watch · 𝕏 tweet · ↗ share) — row sits under the avatar in the left column. */
     .card-actions {
       display: flex; justify-content: space-between; align-items: center;
-      width: 64px; margin-top: 8px;
+      width: 80px; margin-top: 8px;
     }
     .share-btn, .tweet-btn, .watch-btn {
       background: transparent; border: none; cursor: pointer;
@@ -366,10 +366,10 @@
       .collapsible { display: none; }
       .collapsible.expanded { display: block; }
       /* Tighter cards on phones — slightly smaller avatar, less padding, smaller text. */
-      .card { grid-template-columns: 58px 1fr; gap: 10px; padding: 10px 12px; border-radius: 12px; }
-      .avatar { width: 50px; height: 50px; }
-      .avatar-initials { font-size: 17px; }
-      .card-actions { width: 50px; margin-top: 6px; }
+      .card { grid-template-columns: 72px 1fr; gap: 10px; padding: 10px 12px; border-radius: 12px; }
+      .avatar { width: 64px; height: 64px; }
+      .avatar-initials { font-size: 22px; }
+      .card-actions { width: 64px; margin-top: 6px; }
       .share-btn, .tweet-btn { font-size: 11px; padding: 1px 3px; }
       .watch-btn { font-size: 13px; padding: 1px 3px; }
       .name { font-size: 15px; }
