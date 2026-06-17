@@ -31,6 +31,7 @@ import urllib.request
 import urllib.parse
 import urllib.error
 import http.client
+import unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
@@ -184,7 +185,9 @@ def set_field(line, key, value, after="utr"):
 
 
 def name_tokens(s):
-    return set(re.findall(r"[a-z0-9]+", (s or "").lower()))
+    # Strip accents so "Niccolò"/"Prachař"/"López" match their ASCII spellings in our data.
+    flat = "".join(c for c in unicodedata.normalize("NFKD", s or "") if not unicodedata.combining(c))
+    return set(re.findall(r"[a-z0-9]+", flat.lower()))
 
 
 def target_gender(g):
