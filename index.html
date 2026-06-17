@@ -944,7 +944,7 @@
 
     // Populate the Class dropdown from the classYear values present in the data (eligibility order).
     (function populateClass() {
-      const order = ["Fr.", "So.", "Jr.", "Sr.", "Gr."];
+      const order = ["Fr.", "R-Fr.", "So.", "R-So.", "Jr.", "R-Jr.", "Sr.", "R-Sr.", "Gr."];
       const present = new Set(TRANSFERS.map(p => p.classYear).filter(Boolean));
       const years = order.filter(y => present.has(y));
       [...present].filter(y => !order.includes(y)).sort().forEach(y => years.push(y));
