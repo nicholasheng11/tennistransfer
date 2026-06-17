@@ -434,6 +434,44 @@
       .grid { grid-template-columns: 1fr; }
       .card-top { gap: 8px; }
     }
+    /* "This week" activity strip */
+    .week-strip { max-width: 1200px; margin: 16px auto 0; padding: 0 16px; }
+    .week-strip:not(.on) { display: none; }
+    .week-strip .week-inner {
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 14px; font-size: 13px; color: var(--text); line-height: 1.7;
+    }
+    .week-strip .week-count { font-weight: 700; color: var(--accent); }
+    .week-strip .week-name { cursor: pointer; }
+    .week-strip .week-name:hover { text-decoration: underline; color: var(--link); }
+
+    /* UTR-range filter inputs */
+    .utrwrap input { width: 46px; padding: 4px 6px; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--card); color: var(--text); font-size: 13px; }
+    .utrwrap span { color: var(--muted); }
+
+    /* Player detail modal */
+    .card { cursor: pointer; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 1000; }
+    .modal-overlay[hidden] { display: none; }
+    .modal { background: var(--card); color: var(--text); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px; max-width: 440px; width: 100%; position: relative;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4); max-height: 88vh; overflow-y: auto; }
+    .modal-close { position: absolute; top: 8px; right: 12px; background: transparent; border: none;
+      font-size: 24px; line-height: 1; cursor: pointer; color: var(--muted); }
+    .modal-close:hover { color: var(--text); }
+    .modal-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; padding-right: 24px; }
+    .modal-head .avatar { width: 72px; height: 72px; }
+    .modal-name { font-size: 19px; font-weight: 700; }
+    .modal-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0;
+      border-top: 1px solid var(--border); font-size: 14px; }
+    .modal-row .k { color: var(--muted); }
+    .modal-row .v { text-align: right; font-weight: 600; }
+    .modal-links { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .modal-links a, .modal-links button { font-size: 13px; padding: 7px 12px; border-radius: 8px;
+      border: 1px solid var(--border); background: transparent; color: var(--link); cursor: pointer; text-decoration: none; }
+    .modal-links a:hover, .modal-links button:hover { background: var(--share-hover-bg); }
   </style>
 </head>
 
@@ -484,13 +522,31 @@
         <label for="country">From:</label>
         <select id="country"></select>
       </div>
+      <div class="sortwrap utrwrap">
+        <label for="utr-min">UTR:</label>
+        <input id="utr-min" type="number" step="0.1" min="0" max="16" placeholder="min" inputmode="decimal" aria-label="Minimum UTR" />
+        <span>–</span>
+        <input id="utr-max" type="number" step="0.1" min="0" max="16" placeholder="max" inputmode="decimal" aria-label="Maximum UTR" />
+      </div>
+      <div class="sortwrap">
+        <label for="classyr">Class:</label>
+        <select id="classyr"></select>
+      </div>
     </div>
   </header>
 
   <section id="featured" class="featured"></section>
   <section id="conf-flow" class="conf-flow"></section>
+  <div id="week-strip" class="week-strip"></div>
   <div id="count" class="count"></div>
   <div id="grid" class="grid"></div>
+
+  <div id="player-modal" class="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Player details">
+      <button class="modal-close" type="button" aria-label="Close">&times;</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
 
   <footer class="about">
     <details>
@@ -531,6 +587,8 @@
     let countryFilter = "all";
     let schoolFilter = ""; // exact-match school filter, set by clicking a school name on a card
     let watchlistMode = false; // when true, only show players in the user's local watchlist
+    let utrMin = null, utrMax = null;   // UTR-range filter bounds (null = unbounded)
+    let classFilter = "all";            // class-year filter (Fr./So./Jr./Sr./Gr.)
 
     // ---- Watchlist (☆ favorites, persisted in localStorage) ---------------
     const WATCHLIST_KEY = "tennistracker.watchlist";
@@ -570,6 +628,9 @@
     const sortEl = document.getElementById("sort");
     const p4El = document.getElementById("p4");
     const countryEl = document.getElementById("country");
+    const utrMinEl = document.getElementById("utr-min");
+    const utrMaxEl = document.getElementById("utr-max");
+    const classEl = document.getElementById("classyr");
     const activeSchoolEl = document.getElementById("active-school");
 
     // My List pill — toggles the watchlist filter on/off and shows current count.
@@ -851,6 +912,7 @@
         refreshTopDestinations();
         refreshConfFlow();
         refreshWatchPill();
+        refreshWeekStrip();
         renderFeatured();
         render();
       };
@@ -876,6 +938,19 @@
     sortEl.onchange  = () => { sortBy = sortEl.value; render(); };
     p4El.onchange    = () => { p4Filter = p4El.value; render(); };
     countryEl.onchange = () => { countryFilter = countryEl.value; render(); };
+    utrMinEl.oninput = () => { utrMin = utrMinEl.value === "" ? null : parseFloat(utrMinEl.value); render(); };
+    utrMaxEl.oninput = () => { utrMax = utrMaxEl.value === "" ? null : parseFloat(utrMaxEl.value); render(); };
+    classEl.onchange = () => { classFilter = classEl.value; render(); };
+
+    // Populate the Class dropdown from the classYear values present in the data (eligibility order).
+    (function populateClass() {
+      const order = ["Fr.", "So.", "Jr.", "Sr.", "Gr."];
+      const present = new Set(TRANSFERS.map(p => p.classYear).filter(Boolean));
+      const years = order.filter(y => present.has(y));
+      [...present].filter(y => !order.includes(y)).sort().forEach(y => years.push(y));
+      classEl.innerHTML = '<option value="all">All</option>' +
+        years.map(y => '<option value="' + esc(y) + '">' + esc(y) + '</option>').join("");
+    })();
 
     // Populate the From dropdown dynamically from every unique value in the `country` field.
     // The field is overloaded — US players have their state there, international players have their country.
@@ -922,6 +997,22 @@
       // 2a. filter by selected country (exact match on the `country` field, e.g., "France", "Texas").
       if (countryFilter !== "all") {
         players = players.filter(p => p.country === countryFilter);
+      }
+
+      // 2a-ii. UTR range (players with no UTR are excluded once a bound is set)
+      if (utrMin != null || utrMax != null) {
+        players = players.filter(p => {
+          const u = parseFloat(p.utr);
+          if (isNaN(u)) return false;
+          if (utrMin != null && u < utrMin) return false;
+          if (utrMax != null && u > utrMax) return false;
+          return true;
+        });
+      }
+
+      // 2a-iii. class year
+      if (classFilter !== "all") {
+        players = players.filter(p => (p.classYear || "") === classFilter);
       }
 
       // 2b. filter by exact-school (set by clicking a school name on a card).
@@ -1127,10 +1218,35 @@
         '<div class="featured-grid grid">' + featured.map(renderCard).join("") + '</div>';
     }
 
+    // "This week" strip — committed players from the last 7 days for the active gender.
+    const weekStripEl = document.getElementById("week-strip");
+    function refreshWeekStrip() {
+      const today = new Date();
+      const cutoffDate = new Date(today); cutoffDate.setDate(today.getDate() - 7);
+      const pad = n => String(n).padStart(2, "0");
+      const cutoff = cutoffDate.getFullYear() + "-" + pad(cutoffDate.getMonth() + 1) + "-" + pad(cutoffDate.getDate());
+      const recent = TRANSFERS
+        .filter(p => genderMatch(p, activeGender) && p.status === "Committed" && p.newSchool && p.dateUpdated >= cutoff)
+        .sort((a, b) => b.dateUpdated.localeCompare(a.dateUpdated));
+      if (recent.length === 0) { weekStripEl.classList.remove("on"); weekStripEl.innerHTML = ""; return; }
+      weekStripEl.classList.add("on");
+      const names = recent.map(p =>
+        '<span class="week-name" data-id="' + esc(p.id) + '">' + esc(p.name) + ' &rarr; ' + esc(p.newSchool) + '</span>'
+      ).join(" &middot; ");
+      weekStripEl.innerHTML = '<div class="week-inner">🗓️ <span class="week-count">' +
+        recent.length + ' new commit' + (recent.length === 1 ? '' : 's') +
+        '</span> in the last 7 days &middot; ' + names + '</div>';
+    }
+    weekStripEl.addEventListener("click", e => {
+      const n = e.target.closest(".week-name");
+      if (n) openPlayerModal(n.dataset.id);
+    });
+
     refreshStats();   // initial header counts
     refreshTopDestinations();   // initial leaderboard line
     refreshConfFlow();          // initial conference flow chart
     refreshWatchPill();         // initial My List pill state
+    refreshWeekStrip();         // initial "this week" strip
     renderFeatured();           // initial featured row (hidden if no featured players)
     render(); // draw everything for the first time
 
@@ -1204,6 +1320,61 @@
             finally { document.body.removeChild(ta); }
           })
       ).then(flash).catch(() => { window.prompt("Copy this URL:", url); });
+    });
+
+    // ---- Player detail modal -------------------------------------------------
+    const modalEl = document.getElementById("player-modal");
+    const modalBodyEl = document.getElementById("modal-body");
+    function openPlayerModal(id) {
+      const p = TRANSFERS.find(x => String(x.id) === String(id));
+      if (!p) return;
+      const sRank = singlesRankOf(p.name, p.gender);
+      const dRank = doublesRankOf(p.name, p.gender);
+      const tRank = rankOf(p.newSchool, p.gender);
+      const photoImg = p.photoUrl
+        ? '<img src="' + esc(p.photoUrl) + '" alt="" onerror="this.style.display=\'none\'" />' : '';
+      const rows = [];
+      rows.push(["Move", p.newSchool ? esc(p.previousSchool) + " &rarr; " + esc(p.newSchool) : esc(p.previousSchool) + " (in portal)"]);
+      if (p.hometown) rows.push(["Hometown", esc(p.hometown)]);
+      else if (p.country) rows.push(["From", esc(p.country)]);
+      if (p.classYear) rows.push(["Class", esc(p.classYear)]);
+      if (p.utr) rows.push(["UTR", esc(p.utr) + ' <span style="color:var(--muted);font-weight:400">(as of ' + esc(p.utrUpdated || p.dateUpdated) + ')</span>']);
+      if (sRank != null) rows.push(["ITA Singles", "#" + sRank]);
+      if (dRank != null) rows.push(["ITA Doubles", "#" + dRank]);
+      if (tRank != null) rows.push(["New school ITA", "#" + tRank]);
+      const links = [];
+      if (p.utrId) links.push('<a href="https://app.utrsports.net/profiles/' + esc(p.utrId) + '" target="_blank" rel="noopener noreferrer">UTR profile ↗</a>');
+      links.push('<button type="button" class="modal-share" data-id="' + esc(p.id) + '">Copy link</button>');
+      modalBodyEl.innerHTML =
+        '<div class="modal-head">' +
+          '<div class="avatar" style="--avatar-h:' + avatarHue(p.name) + ';" aria-hidden="true">' +
+            '<span class="avatar-initials">' + esc(initials(p.name)) + '</span>' + photoImg +
+          '</div>' +
+          '<div><div class="modal-name">' + esc(p.name) + '</div>' +
+            '<span class="badge ' + badgeClass(p.status) + '" style="display:inline-block;margin-top:6px">' + esc(p.status) + '</span>' +
+          '</div>' +
+        '</div>' +
+        rows.map(r => '<div class="modal-row"><span class="k">' + r[0] + '</span><span class="v">' + r[1] + '</span></div>').join("") +
+        '<div class="modal-links">' + links.join("") + '</div>';
+      modalEl.hidden = false;
+    }
+    function closeModal() { modalEl.hidden = true; }
+    modalEl.addEventListener("click", e => {
+      if (e.target === modalEl || e.target.closest(".modal-close")) { closeModal(); return; }
+      const sh = e.target.closest(".modal-share");
+      if (sh) {
+        const url = location.origin + location.pathname + "?p=" + encodeURIComponent(sh.dataset.id);
+        (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(url) : Promise.reject())
+          .then(() => { sh.textContent = "✓ Copied"; })
+          .catch(() => window.prompt("Copy this URL:", url));
+      }
+    });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !modalEl.hidden) closeModal(); });
+    // Open the modal on a plain card-body click (ignore buttons & school links, which have their own actions).
+    document.addEventListener("click", e => {
+      if (e.target.closest("button, a, .school-link, .week-name")) return;
+      const card = e.target.closest(".card");
+      if (card && card.dataset.id) openPlayerModal(card.dataset.id);
     });
 
     // Deep-link handler: if the URL has ?p=<id>, scroll that card into view and flash it briefly.
