@@ -1,0 +1,4 @@
+# Local tooling secrets — never commit your UTR token
+scripts/.env
+scripts/__pycache__/
+.claude/

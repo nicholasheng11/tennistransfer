@@ -1074,7 +1074,7 @@
       if (doublesRank != null) inlineRank += ' <span class="year" title="ITA Doubles #' + doublesRank + ' as of 2026-05-20">&middot; Doubles #' + doublesRank + '</span>';
       const metaParts = [];
       if (p.country) metaParts.push(esc(p.country));
-      if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
+      if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.utrUpdated || p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
       const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
       const starOn = watchlist.has(p.id) ? "on" : "";
       const starGlyph = watchlist.has(p.id) ? "★" : "☆";
