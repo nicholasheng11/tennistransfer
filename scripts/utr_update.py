@@ -30,6 +30,7 @@ import datetime
 import urllib.request
 import urllib.parse
 import urllib.error
+import http.client
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
@@ -58,24 +59,30 @@ def load_env():
     return cfg
 
 
-def api_get(cfg, path, params=None):
+def api_get(cfg, path, params=None, retries=4):
     url = cfg["UTR_API_BASE"].rstrip("/") + path
     if params:
         url += "?" + urllib.parse.urlencode(params)
     token = cfg["UTR_JWT"]
-    req = urllib.request.Request(url, headers={
+    headers = {
         "Authorization": "Bearer " + token,
         "Cookie": "jwt=" + token,
         "Accept": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-    })
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return resp.status, resp.read().decode("utf-8", "replace")
-    except urllib.error.HTTPError as e:
-        return e.code, e.read().decode("utf-8", "replace")
-    except urllib.error.URLError as e:
-        die(f"Network error hitting {url}: {e}")
+    }
+    last_err = None
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return resp.status, resp.read().decode("utf-8", "replace")
+        except urllib.error.HTTPError as e:
+            return e.code, e.read().decode("utf-8", "replace")  # a real HTTP response (e.g. 401) — return it
+        except (urllib.error.URLError, http.client.HTTPException, OSError) as e:
+            last_err = e
+            time.sleep(1.0 * (attempt + 1))  # transient (dropped connection / timeout) — back off and retry
+    print(f"  ! network error (gave up after {retries} tries): {last_err}", file=sys.stderr)
+    return 0, ""
 
 
 def search_players(cfg, name, top=30):
@@ -210,44 +217,51 @@ def cmd_match(cfg, args):
     today = datetime.date.today().isoformat()
     changed = 0
     skipped = []
-    for i in recs:
-        line = lines[i]
-        if get_field(line, "utrId"):
-            continue  # already linked
-        name = get_field(line, "name") or ""
-        our_utr = get_utr(line)
-        tg = target_gender(get_field(line, "gender") or "")
-        cands = search_players(cfg, name, top=30)
-        time.sleep(DELAY_SECONDS)
-        if tg:
-            g = [c for c in cands if not c["gender"] or c["gender"] == tg]
-            cands = g or cands
-        nt = name_tokens(name)
-        named = [c for c in cands if nt and nt <= name_tokens(c["name"])]
-        rated = [c for c in named if c["utr"] is not None]
-        chosen, how = None, ""
-        if our_utr is not None and rated:
-            best = min(rated, key=lambda c: abs(c["utr"] - our_utr))
-            if abs(best["utr"] - our_utr) <= AUTO_UTR_TOLERANCE:
-                chosen, how = best, "auto~UTR"
-        if not chosen and our_utr is None and len(rated) == 1:
-            chosen, how = rated[0], "auto-1rated"
-        if not chosen and not auto:
-            chosen = prompt_pick(name, our_utr, named or cands)
-            how = "picked"
-        if chosen and chosen["id"]:
-            line = set_field(line, "utrId", chosen["id"])
-            if chosen["utr"] is not None:
-                line = set_field(line, "utr", f"{chosen['utr']:.2f}")
-                line = set_field(line, "utrUpdated", today, after="utr")
-            lines[i] = line
-            print(f"  linked {name:<26} -> id {chosen['id']:>9}  UTR {chosen['utr']}  ({how})")
-            changed += 1
-        else:
-            skipped.append(name)
-    if changed:
-        open(TRANSFERS, "w", encoding="utf-8").write("\n".join(lines))
-    print(f"\nLinked {changed} player(s). Skipped {len(skipped)}.")
+    try:
+        for i in recs:
+            line = lines[i]
+            if get_field(line, "utrId"):
+                continue  # already linked (lets a re-run resume where a previous one stopped)
+            name = get_field(line, "name") or ""
+            try:
+                our_utr = get_utr(line)
+                tg = target_gender(get_field(line, "gender") or "")
+                cands = search_players(cfg, name, top=30)
+                time.sleep(DELAY_SECONDS)
+                if tg:
+                    g = [c for c in cands if not c["gender"] or c["gender"] == tg]
+                    cands = g or cands
+                nt = name_tokens(name)
+                named = [c for c in cands if nt and nt <= name_tokens(c["name"])]
+                rated = [c for c in named if c["utr"] is not None]
+                chosen, how = None, ""
+                if our_utr is not None and rated:
+                    best = min(rated, key=lambda c: abs(c["utr"] - our_utr))
+                    if abs(best["utr"] - our_utr) <= AUTO_UTR_TOLERANCE:
+                        chosen, how = best, "auto~UTR"
+                if not chosen and our_utr is None and len(rated) == 1:
+                    chosen, how = rated[0], "auto-1rated"
+                if not chosen and not auto:
+                    chosen = prompt_pick(name, our_utr, named or cands)
+                    how = "picked"
+                if chosen and chosen["id"]:
+                    line = set_field(line, "utrId", chosen["id"])
+                    if chosen["utr"] is not None:
+                        line = set_field(line, "utr", f"{chosen['utr']:.2f}")
+                        line = set_field(line, "utrUpdated", today, after="utr")
+                    lines[i] = line
+                    print(f"  linked {name:<26} -> id {chosen['id']:>9}  UTR {chosen['utr']}  ({how})")
+                    changed += 1
+                else:
+                    skipped.append(name)
+            except Exception as e:
+                print(f"  ! skipped {name}: {e}", file=sys.stderr)
+                skipped.append(name)
+    finally:
+        # Always persist progress — even if interrupted — so a re-run continues, not restarts.
+        if changed:
+            open(TRANSFERS, "w", encoding="utf-8").write("\n".join(lines))
+    print(f"\nLinked {changed} player(s) this run. Skipped {len(skipped)}.")
     if skipped:
         print("Unmatched (re-run WITHOUT --auto to pick manually, or they're not in UTR):")
         for n in skipped:
