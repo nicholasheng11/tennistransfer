@@ -413,6 +413,9 @@
     .utr { font-weight: 600; cursor: help; }
     .singles { font-weight: 600; cursor: help; }
     .utr-note { font-size: 0.75em; color: #9ca3af; font-weight: 400; }
+    .utr-trend { font-size: 0.78em; font-weight: 700; cursor: help; }
+    .utr-trend.up { color: #16a34a; }
+    .utr-trend.down { color: #dc2626; }
 
     /* ---- Status badges (one color per status) ------------------------- */
     .badge {
@@ -1135,6 +1138,16 @@
       if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
+    // UTR trend chip: ▲/▼ change vs. the previous refresh (utrPrev). Empty if no/equal prior value.
+    function utrTrend(p) {
+      if (!p.utr || !p.utrPrev) return "";
+      const d = parseFloat(p.utr) - parseFloat(p.utrPrev);
+      if (isNaN(d) || Math.abs(d) < 0.01) return "";
+      const up = d > 0;
+      return ' <span class="utr-trend ' + (up ? "up" : "down") +
+        '" title="' + (up ? "+" : "−") + Math.abs(d).toFixed(2) + ' since last update (was ' + esc(p.utrPrev) + ')">' +
+        (up ? "▲" : "▼") + Math.abs(d).toFixed(2) + '</span>';
+    }
     // Deterministic hue (0-359) seeded by name — same player always gets the same avatar color.
     function avatarHue(name) {
       let h = 0;
@@ -1167,7 +1180,7 @@
       if (doublesRank != null) inlineRank += ' <span class="year" title="ITA Doubles #' + doublesRank + ' as of 2026-05-20">&middot; Doubles #' + doublesRank + '</span>';
       const metaParts = [];
       if (p.country) metaParts.push(esc(p.country));
-      if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.utrUpdated || p.dateUpdated) + '">UTR ' + esc(p.utr) + ' <span class="utr-note">(at update)</span></span>');
+      if (p.utr) metaParts.push('<span class="utr" title="UTR ' + esc(p.utr) + ' as of ' + esc(p.utrUpdated || p.dateUpdated) + '">UTR ' + esc(p.utr) + utrTrend(p) + ' <span class="utr-note">(at update)</span></span>');
       const meta = metaParts.length ? '<div class="meta">' + metaParts.join(' &middot; ') + '</div>' : '';
       const starOn = watchlist.has(p.id) ? "on" : "";
       const starGlyph = watchlist.has(p.id) ? "★" : "☆";
@@ -1338,7 +1351,7 @@
       if (p.hometown) rows.push(["Hometown", esc(p.hometown)]);
       else if (p.country) rows.push(["From", esc(p.country)]);
       if (p.classYear) rows.push(["Class", esc(p.classYear)]);
-      if (p.utr) rows.push(["UTR", esc(p.utr) + ' <span style="color:var(--muted);font-weight:400">(as of ' + esc(p.utrUpdated || p.dateUpdated) + ')</span>']);
+      if (p.utr) rows.push(["UTR", esc(p.utr) + utrTrend(p) + ' <span style="color:var(--muted);font-weight:400">(as of ' + esc(p.utrUpdated || p.dateUpdated) + ')</span>']);
       if (sRank != null) rows.push(["ITA Singles", "#" + sRank]);
       if (dRank != null) rows.push(["ITA Doubles", "#" + dRank]);
       if (tRank != null) rows.push(["New school ITA", "#" + tRank]);

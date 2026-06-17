@@ -313,6 +313,8 @@ def cmd_refresh(cfg, args):
         if new == old:
             continue
         if not dry:
+            if old:
+                line = set_field(line, "utrPrev", old, after="utr")  # stash prior value for trend arrows
             line = set_field(line, "utr", new)
             line = set_field(line, "utrUpdated", today, after="utr")
             lines[i] = line
