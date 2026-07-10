@@ -12,6 +12,7 @@
 //   - give every player a unique id (just use the next number)
 
 const TRANSFERS = [
+  { id: "296", gender: "M", name: "Esunge Ndumbe", status: "Committed", previousSchool: "Ferris State, Belmont", newSchool: "Michigan State", country: "", utr: "12.54", classYear: "Gr.", dateUpdated: "2026-07-10", photoUrl: "" },
   { id: "295", gender: "W", name: "Stefani Webb", status: "Committed", previousSchool: "UCF, Auburn", newSchool: "Tennessee", country: "Australia", utr: "10.51", classYear: "", dateUpdated: "2026-06-17", photoUrl: "" },
   { id: "294", gender: "W", name: "Nicole Khirin", status: "Committed", previousSchool: "Texas, Texas A&M", newSchool: "UNC", country: "Israel", utr: "", classYear: "Gr.", dateUpdated: "2026-06-17", photoUrl: "https://images.sidearmdev.com/resize?url=https%3A%2F%2Fdxbhsrqyrr690.cloudfront.net%2Fsidearm.nextgen.sites%2Ftamu.sidearmsports.com%2Fimages%2F2024%2F10%2F2%2FKhirin__Nicole.jpg&width=1600&type=jpeg" },
   { id: "258", gender: "W", name: "Zoie Epps", status: "Committed", previousSchool: "Louisiana Tech", newSchool: "Oklahoma", country: "Oklahoma", utr: "10.39", utrPrev: "10.38", utrUpdated: "2026-06-17", utrId: "3587210", classYear: "Jr.", dateUpdated: "2026-06-17", photoUrl: "https://latechsports.com/images/2025/9/19/Epps__Zoie_Hm1tW.jpg" },
